@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="address/address_layout">
+<body>
+	<div layout:fragment="tab_content">
+
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">City List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<div class="table-filter">
+				<div class="form-group">
+					<div class="col-lg-4">
+						<select id="stateFilterSltId" class="select" required="required" data-placeholder="Select state">
+							<option selected="selected" value="0">All</option>
+							<option th:each="state: ${states}" th:value="${state.id}" th:text="${state.name}" th:selected="${state.id == currentState} ? 'selected'"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th data-toggle="true">No</th>
+						<th>Name</th>
+						<th>Status</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="city, cityStatus : ${cities}">
+						<td th:text="${cityStatus.count + pagingFrom}"></td>
+						<td th:text="${city.name}"></td>
+						<td th:text="${city.status == 0 ? 'Inactive' : 'Active'}"
+							th:class="${city.status == 0 ? 'text-warning-600' : 'text-info-600'}"></td>
+						<td width="10%">
+							<ul class="icons-list large-device text-center">
+								<li th:if="${city.status == 0}"><a href="#" data-toggle="modal" data-popup="tooltip" title="Active" th:onclick="'openCityActiveModal(\''+${city.id}+'\')'"><i class="icon-database-check"></i></a></li>
+								<li th:if="${city.status > 0}"><a href="#" data-toggle="modal" data-popup="tooltip" title="Inactive" th:onclick="'openCityInactiveModal(\''+${city.id}+'\')'"><i class="icon-database-remove"></i></a></li>
+							</ul>
+							<ul class="list list-inline small-device">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li th:if="${city.status == 0}"><a href="#" data-toggle="modal" th:onclick="'openCityActiveModal(\''+${city.id}+'\')'"><i class="icon-database-check"></i>Active</a></li>
+										<li th:if="${city.status > 0}"><a href="#" data-toggle="modal" th:onclick="'openCityInactiveModal(\''+${city.id}+'\')'"><i class="icon-database-remove"></i>Inactive</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div th:replace="fragments/fragments :: simple-paging"></div>
+		</div>
+		<!-- /row toggler -->
+		<!-- Active Modal -->
+		<div id="activeCityMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Active City</h5>
+					</div>
+					<div class="modal-body">
+						<form id="activeStateFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idActiveIptId" />
+								<button type="submit" id="activeCityBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitCityActive()">Active</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Active Modal -->
+		<!-- Active Modal -->
+		<div id="inactiveStateMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Inactive City</h5>
+					</div>
+					<div class="modal-body">
+						<form id="inactiveStateFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idInactiveIptId" />
+								<button type="submit" id="inactiveCityBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitCityInactive()">Inactive</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Active Modal -->
+	</div>
+</body>
+</html>

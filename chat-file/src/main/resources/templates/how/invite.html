@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <title>How Invites Work</title>
+    <style> p, div {font-family:Roboto-Regular,sans-serif;} </style>
+</head>
+<body>
+    <div style="width: 100%">
+        <p>How Referred Invites Work?</p>
+        <p>Every time a new Homeber user signs up with your invite code, you’ll get <span th:text="${credit}"></span>% credit toward their free Homeber lawn-mow (varied by location)</p>
+        <p>Homeber Lawnmow credits apply automatically.</p>
+        <img th:src="@{${resources_path} + '/images/homber-07.png'}" style='width:100%; height:auto'/>
+    </div>
+</body>
+</html>

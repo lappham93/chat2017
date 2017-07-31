@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title th:text="${admin_title}">Saocoo</title>
+	<link rel="icon" type="image/x-icon" th:href="@{${resources_path} + '/images/app-logo.png'}" />
+
+	<!-- Global stylesheets -->
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css"/>
+	<link th:href="${resources_path} + '/limitless/css/icons/icomoon/styles.css'" rel="stylesheet" type="text/css"/>
+	<link th:href="${resources_path} + '/limitless/css/bootstrap.css'" rel="stylesheet" type="text/css"/>
+	<link th:href="${resources_path} + '/limitless/css/core.css'" rel="stylesheet" type="text/css"/>
+	<link th:href="${resources_path} + '/limitless/css/components.css'" rel="stylesheet" type="text/css"/>
+	<link th:href="${resources_path} + '/limitless/css/colors.css'" rel="stylesheet" type="text/css"/>
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/loaders/pace.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/core/libraries/jquery.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/core/libraries/bootstrap.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/loaders/blockui.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/js/midlib/jquery-ui.js'"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/visualization/d3/d3.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/visualization/d3/d3_tooltip.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/visualization/sparkline.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/selects/bootstrap_multiselect.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/styling/switchery.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/selects/select2.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/selects/select2.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/styling/uniform.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/styling/switch.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/inputs/touchspin.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/validation/validate.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/ui/ripple.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/ui/moment/moment.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/pickers/daterangepicker.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/uploaders/dropzone.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/media/fancybox.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/tables/footable/footable.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/tables/datatables/datatables.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/tables/datatables/extensions/fixed_header.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/tables/datatables/extensions/col_reorder.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/pagination/bootpag.min.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/core/app.js'"></script>
+	
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/pages/form_layouts.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/pages/table_responsive.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/pages/form_multiselect.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/pages/form_tags_input.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/tags/tagsinput.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/tags/tokenfield.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/ui/prism.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/ckeditor/ckeditor.js'"></script>
+	<!-- <script type="text/javascript" th:src="${resources_path} + '/limitless/js/pages/form_validation.js'"></script> -->
+	<!-- <script type="text/javascript" th:src="${resources_path} + '/limitless/js/pages/table_elements.js'"></script> -->
+	<script type="text/javascript" th:src="${resources_path} + '/limitless/js/plugins/visualization/echarts/echarts.js'"></script>
+	<!--<script type="text/javascript" th:src="${resources_path} + '/limitless/js/charts/echarts/lines_areas.js'"></script>-->
+	<script type="text/javascript" th:src="${resources_path} + '/js/midlib/bootbox.js'"></script>
+	<!-- /theme JS files -->
+	
+	<!--  app js -->
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/common.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/photoCommon.js'"></script>
+	<!-- app css -->
+	<link th:href="${resources_path} + '/css/app/common.css'" rel="stylesheet" type="text/css"/>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		App.adminPrefix = [[${admin_prefix}]];
+
+        require.config({
+            paths: {
+                echarts: App.adminPrefix + 'static/limitless/js/plugins/visualization/echarts'
+            }
+        });
+		/*]]>*/
+	</script>
+</head>
+
+<body>
+	<div class="container col-sm-12">
+     	<div layout:fragment="body">BODY CONTENT</div>
+   	</div>
+</body>
+</html>

@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/map.js'"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		
+<style type="text/css">
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+/*.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+}*/
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+
+</style>
+
+<h3 class="header smaller lighter blue">Maps</h3>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="col-xs-2">
+            <form id="frmView" name="frmView" class="form-horizontal" role="form" action="/web/admin/map" method="GET">
+                <div id="add_alert_success" class="alert alert-success" style="display: none;"></div>
+                <div id="add_alert_err" class="alert alert-danger" style="display: none;"></div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label no-padding-right no-padding-left" for="form-field-1-1">Event: <span class="orange">(*)</span></label>
+                    <div class="col-xs-12">
+                        <div class="col-xs-12 col-sm-10" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                            <select class="col-xs-12 col-sm-12" id="eid" name="eid" data-placeholder="Choose a event..." onchange="changeEvent(); return false;">
+                                <option value=""> Choose a event... </option>
+                                {{#loop_option_event}}
+                                <option value="{{KEY}}" {{SELECTED}}>{{VALUE}}</option>
+                                {{/loop_option_event}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-5 control-label no-padding-right no-padding-left" for="form-field-1-1">Floor: <span class="orange">(*)</span></label>
+                    <div class="col-xs-12">
+                        <div class="col-xs-12 col-sm-10" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                            <select class="col-xs-12 col-sm-12" id="fid" name="fid" data-placeholder="Choose a floor...">
+                                <option value=""> Choose a floor... </option>
+                                {{#loop_option_floor}}
+                                <option value="{{KEY}}" {{SELECTED}}>{{VALUE}}</option>
+                                {{/loop_option_floor}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix">
+                    <div class="col-md-offset-3 col-md-9">
+                        <button id="btnview" class="btn btn-xs btn-info" type="button" onclick="viewMap();"><i class="ace-icon fa fa-check bigger-110"></i>View</button>
+                    </div>
+                </div>
+                <input type="hidden" id="option" name="option" value="viewmap"/>
+            </form>
+        </div>
+        
+<script type="text/javascript">
+    
+    function viewMap(){
+        var serr = "";
+        var eid = $('#eid').val();
+        if(eid == ''){
+            serr += "Event required. ";
+        }
+        var fid = $('#fid').val();
+        if(fid == ''){
+            serr += "Floor required. ";
+        }
+        if(serr == ''){
+            console.log('frmView submit...');
+            $("#btnview").button('loading');
+            $('#frmView').submit();
+            return true;
+        } else{
+            $('#add_alert_err').html(serr);
+            $('#add_alert_err').show();
+            $('#btnview').button('reset');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+            setTimeout(function() {
+                $('#add_alert_err').hide();
+            }, 3000);
+            return false;
+        }
+    }
+    
+    var optionFL = '<option value="KEY" SELECTED>VALUE</option>';
+    var optdefFL = '<option value=""> Choose a floor... </option>';
+    function changeEvent(){
+        //reset.
+        $('#fid').empty().append(optdefFL);
+        var eid = $('#eid').val();
+        if(eid == ''){
+            $('#fid').val('');
+        } else{
+            var data = {
+                action: 'getFloorOfEvent',
+                id: eid
+            };
+            $.ajax({
+                type: "POST",
+                url: "{{domain}}/web/admin/map",
+                data: data,
+                dataType : 'json',
+                cache: false,
+                success: function(data){
+                    if(data.err >= 0){
+                        var farr = data.farr;
+                        if(farr != null && farr.length > 0){
+                            for(var i=0; i < farr.length; i++){
+                                var f = farr[i];
+                                var tmpOpt = optionFL.replace(/KEY/g, f.id);
+                                tmpOpt = tmpOpt.replace(/VALUE/g, f.name);
+                                tmpOpt = tmpOpt.replace(/SELECTED/g, '');
+                                $('#fid').append(tmpOpt);
+                            }
+                        }
+                    } else{
+                        console.log(data.msg);
+//                        bootbox.dialog({
+//                            message: data.msg,
+//                            buttons: {
+//                                "success" : {
+//                                    "label" : "OK",
+//                                    "className" : "btn-sm btn-primary"
+//                                }
+//                            }
+//                        });
+                        return false;
+                    }
+                }
+            });
+        }
+    }
+    
+    
+    
+</script>
+        
+        <div class="col-xs-8" style="background-color: lightgray; padding-left: 0px; padding-right: 0px;">
+        
+{{#SS_MAP}}
+<!--<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3plus.org/js/d3plus.js"></script>
+<script src="https://d3js.org/d3-collection.v1.min.js"></script>-->
+<!--<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>-->
+<script src="{{static-domain}}/mitassets/js/jquery-ui.js"></script>
+<script src="{{static-domain}}/mitassets/js/d3/d3.v3.min.js"></script>
+<script src="{{static-domain}}/mitassets/js/d3/d3plus.js"></script>
+<script src="{{static-domain}}/mitassets/js/d3/d3-collection.v1.min.js"></script>
+
+<svg id="map" width="978" height="600"></svg>
+
+<script type="text/javascript">
+    // Width x Height of raw image.
+    var WI = {{WIDTH_IMG}}; //5000;
+    var HI = {{HEIGHT_IMG}}; //5389;
+    // Width x Height of map.
+    var WM = 978;
+    var HM = 600; //768;
+    // Width x Height of view image.
+    var WV = {{WIDTH_VIEW}}; //556; //713;
+    var HV = 600; //768;
+    
+    //Color
+    var CL_Green = "#ae2";
+    var CL_GreenLeaf = "#009688";
+    var CL_Orange = "#FFA500";
+    var CL_Brown = "#A52A2A";
+    var CL_Blue = "#2196F3";
+    var CL_Violet = "#9C27B0";
+    var CL_Cham  = "#3F51B5";
+    var CL_Lam  = "#00BCD4";
+    var CL_Red  = "#F43636";
+    var CL_Yellow  = "#FFEB3B";
+    var CL_Gray  = "#607D8B";
+    
+    // Zoom
+    var MAX_ZOOM_IN = 10.0;
+    var MAX_ZOOM_OUT = 0.2;
+    var zoomStep = 0.2;
+    var actualZoomLevel = 1.0;
+    var MOVE_STEP = 100;
+    var nodes, nodes_data, zoomable_layer, zoom;
+
+    // Map Label.
+    var mapLabel = {};
+    var mapInfoLabel = {};
+    
+    // store data point.
+    var index = 0;
+    var mapCC = {};             // map store object circle SVG.
+    var mapNPCC = {};           // map store add new object point.
+    var mapDPCC = {};           // map store delete old object point.
+    
+    var mapCCBTH = {};             // map store object circle SVG.
+    var mapNBTH = {};           // map store add new object Booth.
+    var mapDBTH = {};           // map store delete old object Booth.
+    
+    var mapCCELE = {};             // map store object circle SVG.
+    var mapNELE = {};           // map store add new object Elevator.
+    var mapDELE = {};           // map store delete old object Elevator.
+    
+    var mapCCESC = {};             // map store object circle SVG.
+    var mapNESC = {};           // map store add new object Escalator.
+    var mapDESC = {};           // map store delete old object Escalator.
+    
+    var mapCCBC = {};             // map store object circle SVG.
+    var mapNBC = {};           // map store add new object Beacon.
+    var mapDBC = {};           // map store delete old object Beacon.
+    
+    var mapCCWC = {};             // map store object circle SVG.
+    var mapNWC = {};           // map store add new object WC.
+    var mapDWC = {};           // map store delete old object WC.
+    
+    var mapCCTK = {};             // map store object circle SVG.
+    var mapNTK = {};           // map store add new object Talk.
+    var mapDTK = {};           // map store delete old object Talk.
+    
+    // store data edge.
+    var mapPath = {};           // map store object path SVG.
+    var mapNEdge = {};           // map store add new object edge.
+    var mapDEdge = {};           // map store delete old object edge.
+    var indexEdge = 0;
+    
+    var nType = 7;
+    
+    // data load form DB.
+    var dataPoint = {{DATA_POINT}};
+    var dataEdge = {{DATA_EDGE}};
+    
+    var dataPointBTH = {{DATA_BTH}};
+    var dataPointELE = {{DATA_ELE}};
+    var dataPointESC = {{DATA_ESC}};
+    var dataPointBC = {{DATA_BC}};
+    var dataPointWC = {{DATA_WC}};
+    var dataPointTK = {{DATA_TK}};
+
+    // Objects SVG.
+    var map = d3.select("#map")
+        .attr("width", WM)
+        .attr("height", HM)
+        .on("dblclick", dblclickMap);
+
+    var container = map.append("g");
+
+    //Create the drag and drop behavior to set for the objects crated
+    var drag = d3.behavior.drag()
+        .origin(function(d) { return d; })
+        .on("dragstart", dragstarted)
+        .on("drag", dragged)
+        .on("dragend", dragended);
+
+    //Get the background image from the server and set the viewport size
+    //.attr("xlink:href","http://wafi.iit.cnr.it/webvis/tmp/tiger.svg")
+    //.attr("xlink:href","{{static-domain}}/map/mapdemo.svg")
+    var mapImage = container.append("image")
+        .attr('id', "mapimg")
+        .attr("xlink:href","{{LINK_IMG}}")
+        .attr("width", WV)
+        .attr("height", HV)
+        .attr("transform", "translate(0,0)")
+        .classed('draggable', true)
+        .on("dblclick", dblclickImg)
+        .on("mouseup", mouseupImg)
+        .on("mousemove", mousemoveImg)
+        .call(drag);
+
+    var gcc = container.append("g")
+        .attr('id', "gcc")
+        .attr("width", WV)
+        .attr("height", HV)
+        .attr("transform", "translate(0,0)");
+        //.classed('draggable', true)
+        //.on("dblclick", dblclickImg)
+        //.call(drag);
+
+    //=========== Tooltips ===========//
+    function positionTooltip(mouse, scene, tt){
+        var t = mouse.y - tt.height - 35;
+        var l = mouse.x - (tt.width / 2) - 10;
+        return { top: t, left: l};
+    }
+    
+    var tooltip = d3.select("body")
+                    .append("div")
+                    .attr("id", "maptt")
+                    .attr("class", "d3-tip")
+                    .style("position", "absolute")
+                    .style("z-index", "10")
+                    .style("visibility", "hidden")
+                    .text("a simple tooltip");
+    
+    var margin = {
+        x: 10,
+        y: 10
+    };
+    var padding = {
+        x: 10,
+        y: 10
+    };
+    var tt = {
+        width: $('#maptt').width(),
+        height: $('#maptt').height(),
+    }
+    var scene = {
+        x: margin.x + padding.x,
+        y: margin.y + padding.y,
+        width: WV - (margin.x * 2) - (padding.x * 2),
+        height: HV - (margin.y * 2) - (padding.y * 2)
+    }
+    
+    function showTT(){
+        //return tooltip.style("top", (event.pageY-45)+"px").style("left",(event.pageX-20)+"px").style("visibility", "visible").text(text);
+        var id = this.id;
+        var text = "Id: " + id;
+        
+        var clazz = $(this).attr('class');
+        console.log("showTT circle clazz: " + clazz);
+        var isNew = true;
+        var type = '';
+        if(clazz && clazz.length > 0){
+            isNew = clazz.indexOf('cnew') > -1 ? true : false;
+            for(var i = 0; i < nType; i++){
+                var stype = 'type' + i;
+                if(clazz.indexOf(stype) > -1){
+                    type = '' + i;
+                    break;
+                }
+            }
+        }
+        console.log("showTT circle isNew: " + isNew);
+        console.log("showTT circle type: " + type);
+        if(type == '1'){ //Booth
+            var old;
+            if(isNew){ // circle add new.
+                old = mapNBTH[id];
+            } else{ // circle old from dataPointBTH.
+                old = dataPointBTH[id];
+            }
+            if(old){
+                text = text + "<br>" + "Name: " + old.name;
+            }
+        } else if(type == '2'){ //Elevator
+            var old;
+            if(isNew){ // circle add new.
+                old = mapNELE[id];
+            } else{ // circle old from dataPointELE.
+                old = dataPointELE[id];
+            }
+            if(old){
+                text = text + "<br>" + "Name: " + old.name;
+            }
+        } else if(type == '3'){ //Escalator
+            var old;
+            if(isNew){ // circle add new.
+                old = mapNESC[id];
+            } else{ // circle old from dataPointESC.
+                old = dataPointESC[id];
+            }
+            if(old){
+                text = text + "<br>" + "Name: " + old.name;
+            }
+        } else if(type == '4'){ //Beacon
+            var old;
+            if(isNew){ // circle add new.
+                old = mapNBC[id];
+            } else{ // circle old from dataPointBC.
+                old = dataPointBC[id];
+            }
+            if(old){
+                text = text + "<br>" + "Name: " + old.name;
+            }
+        } else if(type == '5'){ //WC
+            var old;
+            if(isNew){ // circle add new.
+                old = mapNWC[id];
+            } else{ // circle old from dataPointWC.
+                old = dataPointWC[id];
+            }
+            if(old){
+                text = text + "<br>" + "Name: " + old.name;
+            }
+        } else if(type == '6'){ //Talk
+            var old;
+            if(isNew){ // circle add new.
+                old = mapNTK[id];
+            } else{ // circle old from dataPointTK.
+                old = dataPointTK[id];
+            }
+            if(old){
+                text = text + "<br>" + "Name: " + old.name;
+            }
+        }
+        
+        if(this.style){
+            this.style.fill = CL_Orange;
+        }
+        
+        tooltip.html(text).style("visibility", "visible").style("opacity", 0.6);
+        tt = {
+            width: $('#maptt').width(),
+            height: $('#maptt').height(),
+        }
+        var pos = positionTooltip(
+        {
+            x: event.pageX,
+            y: event.pageY
+        }, scene, tt);
+        return tooltip.style("left", function(){
+            return (pos.left) + 'px';
+        }).style("top", function(){
+            return (pos.top) + 'px';
+        });
+    }
+    
+    function moveTT(){
+//        var id = this.id;
+//        var text = "nnnnnnnnnnnid: " + id;
+        //return tooltip.style("top", (event.pageY-45)+"px").style("left",(event.pageX-20)+"px"); //.text(text);
+        
+        var pos = positionTooltip(
+        {
+            x: event.pageX,
+            y: event.pageY
+        }, scene, tt);
+        
+        return tooltip.style("left", function(){
+            return (pos.left) + 'px';
+        }).style("top", function(){
+            return (pos.top) + 'px';
+        });
+    }
+    
+    function hideTT(){
+        //tooltip.transition().duration(500).style("opacity", 0);
+        var clazz = $(this).attr('class');
+        console.log("hideTT circle clazz: " + clazz);
+        var type = '';
+        if(clazz && clazz.length > 0){
+            isNew = clazz.indexOf('cnew') > -1 ? true : false;
+            for(var i = 0; i < nType; i++){
+                var stype = 'type' + i;
+                if(clazz.indexOf(stype) > -1){
+                    type = '' + i;
+                    break;
+                }
+            }
+        }
+        console.log("hideTT circle type: " + type);
+        
+        if(type == '0'){ //Point
+            if(this.style){
+                if(this.id.length > 6){
+                    this.style.fill = CL_GreenLeaf;
+                } else{
+                    this.style.fill = CL_Green;
+                }
+            }
+        } else if(type == '1'){ //Booth
+            this.style.fill = CL_Violet;
+        } else if(type == '2'){ //Elevator
+            this.style.fill = CL_Cham;
+        } else if(type == '3'){ //Escalator
+            this.style.fill = CL_Lam;
+        } else if(type == '4'){ //Beacon
+            this.style.fill = CL_Red;
+        } else if(type == '5'){ //WC
+            this.style.fill = CL_Yellow;
+        } else if(type == '6'){ //Talk
+            this.style.fill = CL_Gray;
+        }
+        
+        return tooltip.style("visibility", "hidden");
+    }
+    //=========== End Tooltips ===========//
+
+    //=========== Drag ===========//
+    // flag tracking drag.
+    var drg = false;
+    //Called when drag event starts. It stop the propagation of the click event
+    function dragstarted(d){
+        console.log("================dragstarted==============");
+        drg = false;
+        d3.event.sourceEvent.stopPropagation();
+    }
+    
+    //Called when the drag event occurs (object should be moved)
+    function dragged(d){
+        d.x = d3.event.x;
+        d.y = d3.event.y;
+        //console.log("drag: [x:"+d.x+", y:"+d.y+"]");
+        //Translate the object on the actual moved point
+        d3.select(this).attr({
+            transform: "translate(" + d.x + "," + d.y + ")"
+        });
+        gcc.attr({
+            transform: "translate(" + d.x + "," + d.y + ")"
+        });
+        
+        drg = true;
+        
+    }
+    
+    function dragended(d){
+        //d3.event.sourceEvent.stopPropagation();
+        console.log("================dragended==============");
+        
+        // If has drag, update position list circles.
+        if(drg){
+            
+        }
+        drg = false;
+    }
+
+    //=========== Event Mouse DoubleClick ===========//
+    function drawCircle(idp, x, y, text, type){
+        console.log("drawCircle at: [x:"+x+", y:"+y+"]");
+        var stype = 'type' + type;
+        var id = idp != '' ? idp : index;
+        var color = ''; // = idp != '' ? CL_GreenLeaf : CL_Green;
+        var clazz = idp != '' ? "cold" : "cnew";
+        clazz = clazz + " " + stype;
+        var c;
+        if(type == '0'){
+            color = idp != '' ? CL_GreenLeaf : CL_Green;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .on("mousedown", mousedownCC)
+                    .on("mousemove", mousemoveCC)
+                    .on("mouseup", mouseupCC)
+                    .style("fill", color);
+            mapCC[id] = c;
+        } else if(type == '1'){ //Booth
+            color = CL_Violet;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .style("fill", color);
+            mapCCBTH[id] = c;
+        } else if(type == '2'){ //Elevator
+            color = CL_Cham;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .style("fill", color);
+            mapCCELE[id] = c;
+        } else if(type == '3'){ //Escalator
+            color = CL_Lam;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .style("fill", color);
+            mapCCESC[id] = c;
+        } else if(type == '4'){ //Beacon
+            color = CL_Red;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .style("fill", color);
+            mapCCBC[id] = c;
+        } else if(type == '5'){ //WC
+            color = CL_Yellow;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .style("fill", color);
+            mapCCWC[id] = c;
+        } else if(type == '6'){ //Talk
+            color = CL_Gray;
+            c = gcc.append("circle")
+                    .attr("id", id)
+                    .attr("class", "node " + clazz)
+                    .attr("cx", x)
+                    .attr("cy", y)
+                    .attr("r", 3)
+                    .on("dblclick", dblclickCC)
+                    .on("mouseover", showTT)
+                    .on("mousemove", moveTT)
+                    .on("mouseout", hideTT)
+                    .style("fill", color);
+            mapCCTK[id] = c;
+        }
+        
+        //map label
+        if(text){
+            var tid = id + "_t";
+            var t = gcc.append("text")
+                            .attr("id", tid)
+                            .attr("class", "wrap")
+                            .attr("x", x+3)
+                            .attr("y", y)
+                            .text(text)
+                            .style("font-size", "9");
+            var infoLabel = {text: text, x: x, y: y};
+            mapLabel[tid] = t;
+            mapInfoLabel[tid] = infoLabel;
+        }
+        
+        //print console.
+        var smapCC = JSON.stringify(mapCC);
+        console.log("drawCircle smapCC: " + smapCC);
+        var smapCCBTH = JSON.stringify(mapCCBTH);
+        console.log("drawCircle smapCCBTH: " + smapCCBTH);
+        var smapCCELE = JSON.stringify(mapCCELE);
+        console.log("drawCircle smapCCELE: " + smapCCELE);
+        var smapCCESC = JSON.stringify(mapCCESC);
+        console.log("drawCircle smapCCESC: " + smapCCESC);
+        var smapCCBC = JSON.stringify(mapCCBC);
+        console.log("drawCircle smapCCBC: " + smapCCBC);
+        var smapCCWC = JSON.stringify(mapCCWC);
+        console.log("drawCircle smapCCWC: " + smapCCWC);
+        var smapCCTK = JSON.stringify(mapCCTK);
+        console.log("drawCircle smapCCTK: " + smapCCTK);
+        
+        return c;
+    }
+
+    function dblclickCC(d){
+        console.log("---------------dblclickCC---------------");
+        var clazz = $(this).attr('class');
+        console.log("delete circle clazz: " + clazz);
+        var sid = this.id;
+        console.log("delete circle sid: " + sid);
+        
+        var isNew = true;
+        var type = '';
+        if(clazz && clazz.length > 0){
+            isNew = clazz.indexOf('cnew') > -1 ? true : false;
+            for(var i = 0; i < nType; i++){
+                var stype = 'type' + i;
+                if(clazz.indexOf(stype) > -1){
+                    type = '' + i;
+                    break;
+                }
+            }
+        }
+        console.log("delete circle isNew: " + isNew);
+        console.log("delete circle type: " + type);
+        
+        if(type == '0'){ //Point.
+            var id = sid;
+            var c = mapCC[id];
+            if(c != null){
+                c.remove();
+            }
+            deleteEdgeByCC(id);
+            delete mapCC[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNPCC[id];
+            } else{ // delete circle old.
+                // Add to mapDPCC and Delete from dataPoint.
+                var oldp = dataPoint[id];
+                if(oldp){
+                    mapDPCC[id] = oldp;
+                }
+                delete dataPoint[id];
+            }
+        } else if(type == '1'){ //Booth
+            var id = sid;
+            var c = mapCCBTH[id];
+            if(c != null){
+                c.remove();
+            }
+            delete mapCCBTH[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNBTH[id];
+            } else{ // delete circle old.
+                // Add to mapDBTH and Delete from dataPointBTH.
+                var oldp = dataPointBTH[id];
+                if(oldp){
+                    mapDBTH[id] = oldp;
+                }
+                delete dataPointBTH[id];
+            }
+        } else if(type == '2'){ //Elevator
+            var id = sid;
+            var c = mapCCELE[id];
+            if(c != null){
+                c.remove();
+            }
+            delete mapCCELE[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNELE[id];
+            } else{ // delete circle old.
+                // Add to mapDELE and Delete from dataPointELE.
+                var oldp = dataPointELE[id];
+                if(oldp){
+                    mapDELE[id] = oldp;
+                }
+                delete dataPointELE[id];
+            }
+        } else if(type == '3'){ //Escalator
+            var id = sid;
+            var c = mapCCESC[id];
+            if(c != null){
+                c.remove();
+            }
+            delete mapCCESC[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNESC[id];
+            } else{ // delete circle old.
+                // Add to mapDESC and Delete from dataPointESC.
+                var oldp = dataPointESC[id];
+                if(oldp){
+                    mapDESC[id] = oldp;
+                }
+                delete dataPointESC[id];
+            }
+        } else if(type == '4'){ //Beacon
+            var id = sid;
+            var c = mapCCBC[id];
+            if(c != null){
+                c.remove();
+            }
+            delete mapCCBC[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNBC[id];
+            } else{ // delete circle old.
+                // Add to mapDBC and Delete from dataPointBC.
+                var oldp = dataPointBC[id];
+                if(oldp){
+                    mapDBC[id] = oldp;
+                }
+                delete dataPointBC[id];
+            }
+        } else if(type == '5'){ //WC
+            var id = sid;
+            var c = mapCCWC[id];
+            if(c != null){
+                c.remove();
+            }
+            delete mapCCWC[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNWC[id];
+            } else{ // delete circle old.
+                // Add to mapDWC and Delete from dataPointWC.
+                var oldp = dataPointWC[id];
+                if(oldp){
+                    mapDWC[id] = oldp;
+                }
+                delete dataPointWC[id];
+            }
+        } else if(type == '6'){ //Talk
+            var id = sid;
+            var c = mapCCTK[id];
+            if(c != null){
+                c.remove();
+            }
+            delete mapCCTK[id];
+            
+            if(isNew){ // delete circle add new.
+                delete mapNTK[id];
+            } else{ // delete circle old.
+                // Add to mapDTK and Delete from dataPointTK.
+                var oldp = dataPointTK[id];
+                if(oldp){
+                    mapDTK[id] = oldp;
+                }
+                delete dataPointTK[id];
+            }
+        }
+        
+        //delete text name.
+        var tid = sid + '_t';
+        var t = mapLabel[tid];
+        if(t){
+            t.remove();
+        }
+        if(mapInfoLabel[tid]){
+            delete mapInfoLabel[tid];
+        }
+        
+        hideTT();
+        
+        //print console.
+        var smapCC = JSON.stringify(mapCC);
+        console.log("dblclickCC smapCC: " + smapCC);
+        var smapNPCC = JSON.stringify(mapNPCC);
+        console.log("dblclickCC mapNPCC: " + smapNPCC);
+        var smapDPCC = JSON.stringify(mapDPCC);
+        console.log("dblclickCC mapDPCC: " + smapDPCC);
+        
+        var smapCCBTH = JSON.stringify(mapCCBTH);
+        console.log("dblclickCC smapCCBTH: " + smapCCBTH);
+        var smapNBTH = JSON.stringify(mapNBTH);
+        console.log("dblclickCC mapNBTH: " + smapNBTH);
+        var smapDBTH = JSON.stringify(mapDBTH);
+        console.log("dblclickCC mapDBTH: " + smapDBTH);
+        
+        var smapCCELE = JSON.stringify(mapCCELE);
+        console.log("dblclickCC smapCCELE: " + smapCCELE);
+        var smapNELE = JSON.stringify(mapNELE);
+        console.log("dblclickCC mapNELE: " + smapNELE);
+        var smapDELE = JSON.stringify(mapDELE);
+        console.log("dblclickCC mapDELE: " + smapDELE);
+        
+        var smapCCESC = JSON.stringify(mapCCESC);
+        console.log("dblclickCC smapCCESC: " + smapCCESC);
+        var smapNESC = JSON.stringify(mapNESC);
+        console.log("dblclickCC mapNESC: " + smapNESC);
+        var smapDESC = JSON.stringify(mapDESC);
+        console.log("dblclickCC mapDESC: " + smapDESC);
+        
+        var smapCCBC = JSON.stringify(mapCCBC);
+        console.log("dblclickCC smapCCBC: " + smapCCBC);
+        var smapNBC = JSON.stringify(mapNBC);
+        console.log("dblclickCC mapNBC: " + smapNBC);
+        var smapDBC = JSON.stringify(mapDBC);
+        console.log("dblclickCC mapDBC: " + smapDBC);
+        
+        var smapCCWC = JSON.stringify(mapCCWC);
+        console.log("dblclickCC smapCCWC: " + smapCCWC);
+        var smapNWC = JSON.stringify(mapNWC);
+        console.log("dblclickCC mapNWC: " + smapNWC);
+        var smapDWC = JSON.stringify(mapDWC);
+        console.log("dblclickCC mapDWC: " + smapDWC);
+        
+        var smapCCTK = JSON.stringify(mapCCTK);
+        console.log("dblclickCC smapCCTK: " + smapCCTK);
+        var smapNTK = JSON.stringify(mapNTK);
+        console.log("dblclickCC mapNTK: " + smapNTK);
+        var smapDTK = JSON.stringify(mapDTK);
+        console.log("dblclickCC mapDTK: " + smapDTK);
+        
+        return false;
+    }
+
+    function dblclickMap(d){
+        var coordinates = [0, 0];
+        coordinates = d3.mouse(this);
+        var mx = coordinates[0];
+        var my = coordinates[1];
+        console.log("dblclick on map at: [x:"+mx+", y:"+my+"]");
+    }
+
+    function dblclickImg(d){
+        
+        // Position of image (id=mapimg) with map.
+        var currentx = d3.transform(d3.select(this).attr("transform")).translate[0];
+        var currenty = d3.transform(d3.select(this).attr("transform")).translate[1];
+        console.log("position current img at: [x:"+currentx+", y:"+currenty+"]");
+        
+        var x = d3.event.x;
+        var y = d3.event.y;
+        console.log("dblclick on d3.event at: [x:"+x+", y:"+y+"]");
+        
+        // Position mouse click on image.
+        var coordinates = [0, 0];
+        coordinates = d3.mouse(this);
+        var mx = coordinates[0];
+        var my = coordinates[1];
+        console.log("dblclick on image at: [x:"+mx+", y:"+my+"]");
+        
+        // Position circle (unit pixel) on image.
+        // convert coordinate of View SVG to coordinate of image.
+        var ix = (mx * WI) / WV;
+        var iy = (my * HI) / HV;
+        
+        // Position circle on map.
+//        var cx = currentx + mx;
+//        var cy = currenty + my;
+        var cx = mx;
+        var cy = my;
+        
+        showDL(cx, cy, ix, iy);
+        
+    }
+    
+    function trackingPointCC(x, y, type, id, name){
+        console.log('trackingPointCC(x='+x+', y='+y+', type='+type+', id='+id+', name='+name+')');
+        //var key = id != '' ? id : index;
+        if(type == '0'){ //Point
+            var pcc = {x: x, y: y};
+            mapNPCC[index] = pcc;
+        } else if(type == '1'){ //Booth
+            var pcc = {x: x, y: y, id: id, name: name};
+            mapNBTH[index] = pcc;
+        } else if(type == '2'){ //Elevator
+            var pcc = {x: x, y: y, id: id, name: name};
+            mapNELE[index] = pcc;
+        } else if(type == '3'){ //Escalator
+            var pcc = {x: x, y: y, id: id, name: name};
+            mapNESC[index] = pcc;
+        } else if(type == '4'){ //Beacon
+            var pcc = {x: x, y: y, id: id, name: name};
+            mapNBC[index] = pcc;
+        } else if(type == '5'){ //WC
+            var pcc = {x: x, y: y, id: id, name: name};
+            mapNWC[index] = pcc;
+        } else if(type == '6'){ //Talk
+            var pcc = {x: x, y: y, id: id, name: name};
+            mapNTK[index] = pcc;
+        }
+        
+        //print console.
+        var smapNPCC = JSON.stringify(mapNPCC);
+        console.log("Put mapNPCC: " + smapNPCC);
+        
+        var smapNBTH = JSON.stringify(mapNBTH);
+        console.log("Put mapNBTH: " + smapNBTH);
+        
+        var smapNELE = JSON.stringify(mapNELE);
+        console.log("Put mapNELE: " + smapNELE);
+        
+        var smapNESC = JSON.stringify(mapNESC);
+        console.log("Put mapNESC: " + smapNESC);
+        
+        var smapNBC = JSON.stringify(mapNBC);
+        console.log("Put mapNBC: " + smapNBC);
+        
+        var smapNWC = JSON.stringify(mapNWC);
+        console.log("Put mapNWC: " + smapNWC);
+        
+        var smapNTK = JSON.stringify(mapNTK);
+        console.log("Put mapNTK: " + smapNTK);
+    }
+    
+    //=========== DrawLine ===========//
+//    var mapNEdge = {};
+//    var indexEdge = 0;
+    var xy0, xy1,
+        path, 
+        keep = false, 
+        line = d3.svg.line()
+                 .x(function(d){ return d[0]; })
+                 .y(function(d){ return d[1]; });
+    var idBegin = -1;
+    var idEnd = -1;
+    function mousedownCC(){
+        console.log('.....mousedownCC.....');
+        path = null;
+        keep = true;
+        xy0 = d3.mouse(this);
+        var sxy0 = JSON.stringify(xy0);
+        console.log("mousedownCC xy0: " + sxy0);
+        idBegin = this.id;
+        console.log("mousedownCC idBegin: " + idBegin);
+        if(idBegin != -1){
+            //var id = parseInt(idBegin);
+            var c = mapCC[idBegin];
+            if(c != null){
+                xy0 = [parseFloat(c.attr("cx")), parseFloat(c.attr("cy"))];
+            }
+        }
+        path = d3.select('#gcc')
+                .append('path')
+                .attr("id", indexEdge)
+                .attr('d', line([xy0, xy0]))
+                .on("dblclick", dblclickLine)
+                .on("mouseover", overPath)
+                .on("mouseout", outPath)
+                .style({'stroke': CL_Brown, 'stroke-width': '1px'});
+    }
+    
+    function mousemoveCC(){
+        console.log('.....mousemoveCC.....');
+        if (keep) {
+            Line = line([xy0, d3.mouse(this).map(function(x){ return x - 1; })]);
+            //console.log(Line);
+            path.attr('d', Line);
+        }
+    }
+    
+    function mouseupCC(){
+        console.log('.....mouseupCC.....');
+        idEnd = this.id;
+        console.log("mouseupCC idEnd: " + idEnd);
+        if (keep) {
+            keep = false;
+            if(idEnd != -1 && idEnd != idBegin){
+                //var id = parseInt(idEnd);
+                var c = mapCC[idEnd];
+                if(c != null){
+                    xy1 = [parseFloat(c.attr("cx")), parseFloat(c.attr("cy"))];
+                }
+                Line = line([xy0, xy1]);
+                console.log(Line);
+                path.attr('d', Line);
+                
+                // check idBegin && idEnd has exist.
+                if(!isExistEdge(idBegin, idEnd)){
+                    var oEdge = {ib: idBegin, ie: idEnd};
+                    mapNEdge[indexEdge] = oEdge;
+                    mapPath[indexEdge] = path;
+                    indexEdge++;
+                } else{
+                    console.log("xxxxxxx Edge Exist xxxxxx");
+                    path.remove();
+                }
+                var smapNEdge = JSON.stringify(mapNEdge);
+                console.log("Print mapNEdge: " + smapNEdge);
+                var smapPath = JSON.stringify(mapPath);
+                console.log("Print mapPath: " + smapPath);
+            } else{
+                path.remove();
+            }
+        }
+        
+        idBegin = -1;
+        idEnd = -1;
+    }
+    
+    function isExistEdge(idBegin, idEnd){
+        if(mapNEdge){
+            for(var i in mapNEdge){
+                var oEdge = mapNEdge[i];
+                if((idBegin == oEdge.ib || idBegin == oEdge.ie) && (idEnd == oEdge.ib || idEnd == oEdge.ie)){
+                    return true;
+                }
+            }
+        }
+        if(dataEdge){
+            for(var i in dataEdge){
+                var oEdge = dataEdge[i];
+                if((idBegin == oEdge.ib || idBegin == oEdge.ie) && (idEnd == oEdge.ib || idEnd == oEdge.ie)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    function mousemoveImg(){
+        //console.log('.....mousemoveImg.....');
+        if (keep) {
+            Line = line([xy0, d3.mouse(this).map(function(x){ return x - 1; })]);
+            //console.log(Line);
+            path.attr('d', Line);
+        }
+    }
+    
+    function mouseupImg(){
+        console.log('.....mouseupIIIIIIII.....');
+        if(keep && path){
+            path.remove();
+        }
+        keep = false;
+        idBegin = -1;
+        idEnd = -1;
+    }
+    
+    function dblclickLine(d){
+        var pid = this.id;
+        console.log("Delete mapNEdge[" + pid + "]");
+        if(mapNEdge[pid]){
+            delete mapNEdge[pid];
+        }
+        if(dataEdge[pid]){
+            var op = dataEdge[pid];
+            mapDEdge[pid] = op;
+            delete dataEdge[pid];
+        }
+        delete mapPath[pid];
+        this.remove();
+        
+        var smapNEdge = JSON.stringify(mapNEdge);
+        console.log("Print mapNEdge: " + smapNEdge);
+        var smapDEdge = JSON.stringify(mapDEdge);
+        console.log("Print mapDEdge: " + smapDEdge);
+        var sdataEdge = JSON.stringify(dataEdge);
+        console.log("Print dataEdge: " + sdataEdge);
+    }
+    
+    // delete all edge has coordinate belong to point is deleted.
+    function deleteEdgeByCC(idcc){
+        if(mapNEdge){
+            for(var i in mapNEdge){
+                var oEdge = mapNEdge[i];
+                if((idcc == oEdge.ib || idcc == oEdge.ie)){
+                    delete mapNEdge[i];
+                    var p = mapPath[i];
+                    if(p){
+                        p.remove();
+                    }
+                    delete mapPath[i];
+                }
+            }
+        }
+        if(dataEdge){
+            for(var i in dataEdge){
+                var oEdge = dataEdge[i];
+                if((idcc == oEdge.ib || idcc == oEdge.ie)){
+                    //Add to map Delete Old Edge mapDEdge.
+                    mapDEdge[i] = oEdge;
+                    //Delete from dataEdge.
+                    delete dataEdge[i];
+                    var p = mapPath[i];
+                    if(p){
+                        p.remove();
+                    }
+                    delete mapPath[i];
+                }
+            }
+        }
+        
+        //print console.
+        var smapNEdge = JSON.stringify(mapNEdge);
+        console.log("DeleteEdgeByCC(" + idcc + ") mapNEdge: " + smapNEdge);
+        var smapDEdge = JSON.stringify(mapDEdge);
+        console.log("DeleteEdgeByCC(" + idcc + ") mapDEdge: " + smapDEdge);
+        var sdataEdge = JSON.stringify(dataEdge);
+        console.log("DeleteEdgeByCC(" + idcc + ") dataEdge: " + sdataEdge);
+        var smapPath = JSON.stringify(mapPath);
+        console.log("DeleteEdgeByCC(" + idcc + ") mapPath: " + smapPath);
+        return false;
+    }
+    
+    function overPath(){
+        if(this.style){
+            this.style.stroke = CL_Blue;
+        }
+    }
+    
+    function outPath(){
+        if(this.style){
+            this.style.stroke = CL_Brown;
+        }
+    }
+    
+    //=========== End DrawLine ===========//
+    
+    //=========== Zoom ===========//
+    //Create the zoom behavior to set for the draw
+    zoom = d3.behavior.zoom().scaleExtent([MAX_ZOOM_OUT, MAX_ZOOM_IN]).on('zoom', zoomed);
+
+    //Function called on the zoom event. It translate the draw on the zoommed point and scale with a certain factor
+    function zoomed() {
+        container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
+
+    //Set the zoom behavior on the container variable (the draw), disable mousedown event for the zoom and set the function to call on the double click	event .on("mousedown.zoom", null).on("dblclick.zoom", dblclickMap)
+    container.call(zoom).on("mousedown.zoom", null).on("dblclick.zoom", null);
+
+    //Matrix containing the x and y coordinates of the created objects (used for draggable events)
+    nodes_data = [{x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}];
+    
+    
+    //Set the drag behavior on the objects having the "draggable" class and set their position on the viewport (by the "node_data" matrix)		
+    nodes = container.selectAll(".draggable").call(drag).data(nodes_data);
+    
+    
+    function zoomIn(){
+        //Calculate and set the new zoom level 
+        actualZoomLevel = roundFloat(parseFloat(actualZoomLevel) + parseFloat(zoomStep));
+        zoom.scale(actualZoomLevel);
+        //Get the actual position of the container
+        var xPosition = d3.transform(container.attr("transform")).translate[0];
+        var yPosition = d3.transform(container.attr("transform")).translate[1];
+        //Esecute the transformation setting the actual position and the new zoom level
+        container.attr("transform", "translate(" + xPosition + ", " + yPosition + ")scale(" + zoom.scale() + ")");
+    }
+
+    function zoomOut(){
+        actualZoomLevel = roundFloat(parseFloat(actualZoomLevel) - parseFloat(zoomStep));
+        zoom.scale(actualZoomLevel);
+        var xPosition = d3.transform(container.attr("transform")).translate[0];
+        var yPosition = d3.transform(container.attr("transform")).translate[1];
+        container.attr("transform", "translate(" + xPosition + ", " + yPosition + ")scale(" + zoom.scale() + ")");
+    }
+
+    function moveDrawLeft(){
+        var xPosition = d3.transform(container.attr("transform")).translate[0];
+        var yPosition = d3.transform(container.attr("transform")).translate[1];
+        container.attr("transform", "translate(" + (xPosition - MOVE_STEP) + ", " + yPosition + ")scale(" + zoom.scale() + ")");
+    }
+
+    function moveDrawRight(){
+        var xPosition = d3.transform(container.attr("transform")).translate[0];
+        var yPosition = d3.transform(container.attr("transform")).translate[1];
+        container.attr("transform", "translate(" + (xPosition + MOVE_STEP) + ", " + yPosition + ")scale(" + zoom.scale() + ")");
+    }
+
+    function moveDrawTop(){
+        var xPosition = d3.transform(container.attr("transform")).translate[0];
+        var yPosition = d3.transform(container.attr("transform")).translate[1];
+        container.attr("transform", "translate(" + xPosition + ", " + (yPosition - MOVE_STEP) + ")scale(" + zoom.scale() + ")");
+    }
+
+    function moveDrawBottom(){
+        var xPosition = d3.transform(container.attr("transform")).translate[0];
+        var yPosition = d3.transform(container.attr("transform")).translate[1];
+        container.attr("transform", "translate(" + xPosition + ", " +(yPosition + MOVE_STEP) + ")scale(" + zoom.scale() + ")");
+    }
+
+    function roundFloat(value){
+        return value.toFixed(2);
+    }
+    
+    function saveMap(){
+        console.log("~~~~~saveMap~~~~~~");
+        showDLSave();
+        return false;
+    }
+    
+    var shLabel = true;
+    function showHideLabel(){
+        console.log("~~~~~showHideLabel~~~~~~");
+        if(shLabel){ // hide all label.
+            shLabel = false;
+            //remove all label has class 'wrap'.
+            d3.selectAll(".wrap").remove();
+            delete mapLabel;
+            $('#showHideLabel').text('Show Label');
+        } else{ // show all label.
+            shLabel = true;
+            $('#showHideLabel').text('Hide Label');
+            if(mapInfoLabel){
+                for(var tid in mapInfoLabel){
+                    var infoLabel = mapInfoLabel[tid];
+                    var t = gcc.append("text")
+                        .attr("id", tid)
+                        .attr("class", "wrap")
+                        .attr("x", infoLabel.x + 3)
+                        .attr("y", infoLabel.y)
+                        .text(infoLabel.text)
+                        .style("font-size", "9");
+                    mapLabel[tid] = t;
+                }
+            }
+        }
+        return false;
+    }
+    
+    //=========== Dialog Add Location ===========//
+    //override dialog's title function to allow for HTML titles
+    $.widget("ui.dialog", $.extend({}, $.ui.dialog.prototype, {
+        _title: function(title) {
+            var $title = this.options.title || '&nbsp;'
+            if( ("title_html" in this.options) && this.options.title_html == true )
+                title.html($title);
+            else title.text($title);
+        }
+    }));
+    
+    var oneEnter = true;
+    function showDL(lx, ly, ix, iy){
+        $('#al_alert_err').hide();
+        $('#namelc').val('');
+        $('#idlc').val(index);
+        $('#lx').val(lx);
+        $('#ly').val(ly);
+        $('#ix').val(ix);
+        $('#iy').val(iy);
+        
+        var dialog = $("#dialog-message").removeClass('hide').dialog({
+            modal: true,
+            title: "<div class='widget-header widget-header-small'><h4 class='smaller'><i class='ace-icon fa fa-map-marker'></i> Add location</h4></div>",
+            title_html: true,
+            buttons: [
+                {
+                    text: "Cancel",
+                    "class" : "btn btn-minier ui-state-focus",
+                    click: function() {
+                        $(this).dialog("close");
+                    }
+                },
+                {
+                    text: "OK",
+                    "class" : "btn btn-primary btn-minier",
+                    click: function() {
+                        submitDLAddPoint();
+                    }
+                }
+            ],
+            open: function() {
+                //$(this).siblings('.ui-dialog-buttonpane').find("button:contains('Cancel')").focus();
+                oneEnter = true;
+                $("#namelc").keydown(function(e) {
+                    if (e.keyCode == $.ui.keyCode.ENTER) {
+                        console.log('ui.keyCode.ENTER');
+                        //$("#dialog-message").siblings('.ui-dialog-buttonpane').find("button:contains('OK')").click();
+                        if(oneEnter){
+                            oneEnter = false;
+                            submitDLAddPoint();
+                        }
+                    }
+                })
+            }
+        });
+        $('#namelc').focus();
+    };
+    
+    
+    
+    function submitDLAddPoint(){
+        // validate.
+        var serr = "";
+        var id = "";
+        var name = "";
+        var type = $('#type').val();
+        if(type == '1'){
+            var bthid = $('#bthid').val();
+            if(bthid == ''){
+                serr = "Booth required. ";
+            } else{
+                //validate booth is old before.
+                if(dataPointBTH){
+                    for(var i in dataPointBTH){
+                        var obth = dataPointBTH[i];
+                        if(obth.id == bthid){
+                            serr = "Booth is old. You delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+                //validate booth have been added before.
+                if(mapNBTH){
+                    for(var i in mapNBTH){
+                        var obth = mapNBTH[i];
+                        if(obth.id == bthid){
+                            serr = "Booth have been added before. You can delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+            }
+            id = bthid;
+            name = $("#bthid option[value='" + bthid + "']").text();
+        } else if(type == '2'){
+            var eleid = $('#eleid').val();
+            if(eleid == ''){
+                serr = "Elevator required. ";
+            } else{
+//                //validate Elevator is old before.
+//                if(dataPointELE){
+//                    for(var i in dataPointELE){
+//                        var oele = dataPointELE[i];
+//                        if(oele.id == eleid){
+//                            serr = "Elevator is old. You delete it before add new location for it.";
+//                            break;
+//                        }
+//                    }
+//                }
+//                //validate Elevator have been added before.
+//                if(mapNELE){
+//                    for(var i in mapNELE){
+//                        var oele = mapNELE[i];
+//                        if(oele.id == eleid){
+//                            serr = "Elevator have been added before. You can delete it before add new location for it.";
+//                            break;
+//                        }
+//                    }
+//                }
+            }
+            id = eleid;
+            name = $("#eleid option[value='" + eleid + "']").text();
+        } else if(type == '3'){
+            var escid = $('#escid').val();
+            if(escid == ''){
+                serr = "Escalator required. ";
+            } else{
+//                //validate Escalator is old before.
+//                if(dataPointESC){
+//                    for(var i in dataPointESC){
+//                        var oesc = dataPointESC[i];
+//                        if(oesc.id == escid){
+//                            serr = "Escalator is old. You delete it before add new location for it.";
+//                            break;
+//                        }
+//                    }
+//                }
+//                //validate Escalator have been added before.
+//                if(mapDESC){
+//                    for(var i in mapDESC){
+//                        var oesc = mapDESC[i];
+//                        if(oesc.id == escid){
+//                            serr = "Escalator have been added before. You can delete it before add new location for it.";
+//                            break;
+//                        }
+//                    }
+//                }
+            }
+            id = escid;
+            name = $("#escid option[value='" + escid + "']").text();
+        } else if(type == '4'){
+            var bcid = $('#bcid').val();
+            if(bcid == ''){
+                serr = "Booth required. ";
+            } else{
+                //validate booth is old before.
+                if(dataPointBC){
+                    for(var i in dataPointBC){
+                        var obc = dataPointBC[i];
+                        if(obc.id == bcid){
+                            serr = "Beacon is old. You delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+                //validate booth have been added before.
+                if(mapNBC){
+                    for(var i in mapNBC){
+                        var obc = mapNBC[i];
+                        if(obc.id == bcid){
+                            serr = "Beacon have been added before. You can delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+            }
+            id = bcid;
+            name = $("#bcid option[value='" + bcid + "']").text();
+        } else if(type == '5'){
+            var wcid = $('#wcid').val();
+            if(wcid == ''){
+                serr = "WC required. ";
+            } else{
+                //validate WC is old before.
+                if(dataPointWC){
+                    for(var i in dataPointWC){
+                        var owc = dataPointWC[i];
+                        if(owc.id == wcid){
+                            serr = "WC is old. You delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+                //validate WC have been added before.
+                if(mapNWC){
+                    for(var i in mapNWC){
+                        var owc = mapNWC[i];
+                        if(owc.id == wcid){
+                            serr = "WC have been added before. You can delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+            }
+            id = wcid;
+            name = $("#wcid option[value='" + wcid + "']").text();
+        } else if(type == '6'){
+            var tkid = $('#tkid').val();
+            if(tkid == ''){
+                serr = "Talk required. ";
+            } else{
+                //validate Talk is old before.
+                if(dataPointTK){
+                    for(var i in dataPointTK){
+                        var otk = dataPointTK[i];
+                        if(otk.id == tkid){
+                            serr = "Talk is old. You delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+                //validate Talk have been added before.
+                if(mapNTK){
+                    for(var i in mapNTK){
+                        var otk = mapNTK[i];
+                        if(otk.id == tkid){
+                            serr = "Talk have been added before. You can delete it before add new location for it.";
+                            break;
+                        }
+                    }
+                }
+            }
+            id = tkid;
+            name = $("#tkid option[value='" + tkid + "']").text();
+        }
+        
+        if(serr == ''){
+            var ix = parseFloat($('#ix').val());
+            var iy = parseFloat($('#iy').val());
+            var cx = parseFloat($('#lx').val());
+            var cy = parseFloat($('#ly').val());
+            drawCircle('', cx, cy, name, type);
+            trackingPointCC(ix, iy, type, id, name);
+            
+            ++index;
+            $("#dialog-message").dialog("close");
+        } else{
+            oneEnter = true;
+            $('#al_alert_err').html(serr);
+            $('#al_alert_err').show();
+            setTimeout(function() {
+                $('#al_alert_err').hide();
+            }, 3000);
+        }
+    }
+    
+    function showDLSave(){
+        $('#save_alert_success').hide();
+        $('#save_alert_err').hide();
+        
+        // Add new point.
+        var smapNPCC = JSON.stringify(mapNPCC);
+        console.log("Save anp: " + smapNPCC);
+        $('#anp').val(smapNPCC);
+        
+        //Delete old point.
+        var smapDPCC = JSON.stringify(mapDPCC);
+        console.log("Save dop: " + smapDPCC);
+        $('#dop').val(smapDPCC);
+        
+        //Add new Edge.
+        var smapNEdge = JSON.stringify(mapNEdge);
+        console.log("Save ane: " + smapNEdge);
+        $('#ane').val(smapNEdge);
+        
+        //Delete old Edge.
+        var smapDEdge = JSON.stringify(mapDEdge);
+        console.log("Save doe: " + smapDEdge);
+        $('#doe').val(smapDEdge);
+        
+        
+        // Add new BTH.
+        var smapNBTH = JSON.stringify(mapNBTH);
+        console.log("Save abth: " + smapNBTH);
+        $('#abth').val(smapNBTH);
+        
+        //Delete old BTH.
+        var smapDBTH = JSON.stringify(mapDBTH);
+        console.log("Save dbth: " + smapDBTH);
+        $('#dbth').val(smapDBTH);
+        
+        // Add new ELE.
+        var smapNELE = JSON.stringify(mapNELE);
+        console.log("Save aele: " + smapNELE);
+        $('#aele').val(smapNELE);
+        
+        //Delete old ELE.
+        var smapDELE = JSON.stringify(mapDELE);
+        console.log("Save dele: " + smapDELE);
+        $('#dele').val(smapDELE);
+        
+        // Add new ESC.
+        var smapNESC = JSON.stringify(mapNESC);
+        console.log("Save aesc: " + smapNESC);
+        $('#aesc').val(smapNESC);
+        
+        //Delete old ESC.
+        var smapDESC = JSON.stringify(mapDESC);
+        console.log("Save desc: " + smapDESC);
+        $('#desc').val(smapDESC);
+        
+        // Add new BC.
+        var smapNBC = JSON.stringify(mapNBC);
+        console.log("Save abc: " + smapNBC);
+        $('#abc').val(smapNBC);
+        
+        //Delete old BC.
+        var smapDBC = JSON.stringify(mapDBC);
+        console.log("Save dbc: " + smapDBC);
+        $('#dbc').val(smapDBC);
+        
+        // Add new WC.
+        var smapNWC = JSON.stringify(mapNWC);
+        console.log("Save awc: " + smapNWC);
+        $('#awc').val(smapNWC);
+        
+        //Delete old WC.
+        var smapDWC = JSON.stringify(mapDWC);
+        console.log("Save dwc: " + smapDWC);
+        $('#dwc').val(smapDWC);
+        
+        // Add new Talk.
+        var smapNTK = JSON.stringify(mapNTK);
+        console.log("Save atk: " + smapNTK);
+        $('#atk').val(smapNTK);
+        
+        //Delete old Talk.
+        var smapDTK = JSON.stringify(mapDTK);
+        console.log("Save dtk: " + smapDTK);
+        $('#dtk').val(smapDTK);
+        
+        
+        var dialog = $("#dialog-save").removeClass('hide').dialog({
+            modal: true,
+            title: "<div class='widget-header widget-header-small'><h4 class='smaller'><i class='ace-icon fa fa-map-marker'></i> Save map</h4></div>",
+            title_html: true,
+            buttons: [
+                {
+                    text: "Cancel",
+                    "class" : "btn btn-minier ui-state-focus",
+                    click: function() {
+                        $(this).dialog("close");
+                    }
+                },
+                {
+                    text: "Save",
+                    "class" : "btn btn-primary btn-minier",
+                    click: function() {
+                        console.log('frmSAVE submit...');
+                        $(this).siblings('.ui-dialog-buttonpane').find("button:contains('Save')").button('loading');
+                        $('#frmSAVE').submit();
+                    }
+                }
+            ],
+            open: function() {
+                $(this).siblings('.ui-dialog-buttonpane').find("button:contains('Cancel')").focus();
+            }
+        });
+    };
+    
+    function completeSaveMap(data){
+        if(data.err >= 0){
+            $('#save_alert_success').html(data.msg);
+            $('#save_alert_success').show();
+            setTimeout(function() {
+                $('#frmSAVE').modal('hide');
+                window.location.reload(true);
+            }, 2000);
+        } else{
+            $('#save_alert_err').html(data.msg);
+            $('#save_alert_err').show();
+
+            $('#frmSAVE').bind('submit');
+            $('#dialog-save').siblings('.ui-dialog-buttonpane').find("button:contains('Save')").button('reset');
+        }
+    };
+    
+    // draw map when page ready.
+    $(function() {
+        drawMapInit();
+    });
+
+    function drawMapInit(){
+        //print console.
+        var sdataPoint = JSON.stringify(dataPoint);
+        console.log("dataPoint: " + sdataPoint);
+        var sdataEdge = JSON.stringify(dataEdge);
+        console.log("dataEdge: " + sdataEdge);
+        
+        var sdataPointBTH = JSON.stringify(dataPointBTH);
+        console.log("dataPointBTH: " + sdataPointBTH);
+        var sdataPointELE = JSON.stringify(dataPointELE);
+        console.log("dataPointELE: " + sdataPointELE);
+        var sdataPointESC = JSON.stringify(dataPointESC);
+        console.log("dataPointESC: " + sdataPointESC);
+        var sdataPointBC = JSON.stringify(dataPointBC);
+        console.log("dataPointBC: " + sdataPointBC);
+        var sdataPointWC = JSON.stringify(dataPointWC);
+        console.log("dataPointWC: " + sdataPointWC);
+        var sdataPointTK = JSON.stringify(dataPointTK);
+        console.log("dataPointTK: " + sdataPointTK);
+        
+        //draw point.
+        if(dataPoint){
+            for(var idp in dataPoint){
+                var op = dataPoint[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    drawCircle(idp, x, y, '', '0');
+                }
+            }
+        }
+        //draw edge.
+        if(dataEdge){
+            for(var ide in dataEdge){
+                var oe = dataEdge[ide];
+                if(oe){
+                    var opb = dataPoint[oe.ib];
+                    var ope = dataPoint[oe.ie];
+                    if(opb && ope){
+                        // convert coordinate of image to coordinate of View SVG.
+                        var xb = (opb.x * WV) / WI;
+                        var yb = (opb.y * HV) / HI;
+                        var xyb = [xb, yb];
+                        
+                        // convert coordinate of image to coordinate of View SVG.
+                        var xe = (ope.x * WV) / WI;
+                        var ye = (ope.y * HV) / HI;
+                        var xye = [xe, ye];
+                        
+                        path = d3.select('#gcc')
+                                .append('path')
+                                .attr("id", indexEdge)
+                                .attr('d', line([xyb, xye]))
+                                .on("dblclick", dblclickLine)
+                                .on("mouseover", overPath)
+                                .on("mouseout", outPath)
+                                .style({'stroke': CL_Brown, 'stroke-width': '1px'});
+                        mapPath[indexEdge] = path;
+                        indexEdge++;
+                    }
+                }
+            }
+        }
+        
+        //draw dataPointBTH
+        if(dataPointBTH){
+            for(var idp in dataPointBTH){
+                var op = dataPointBTH[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    var name = op.name;
+                    drawCircle(idp, x, y, name, '1');
+                }
+            }
+        }
+        //draw dataPointELE
+        if(dataPointELE){
+            for(var idp in dataPointELE){
+                var op = dataPointELE[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    var name = op.name;
+                    drawCircle(idp, x, y, name, '2');
+                }
+            }
+        }
+        //draw dataPointESC
+        if(dataPointESC){
+            for(var idp in dataPointESC){
+                var op = dataPointESC[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    var name = op.name;
+                    drawCircle(idp, x, y, name, '3');
+                }
+            }
+        }
+        //draw dataPointBC
+        if(dataPointBC){
+            for(var idp in dataPointBC){
+                var op = dataPointBC[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    var name = op.name;
+                    drawCircle(idp, x, y, name, '4');
+                }
+            }
+        }
+        //draw dataPointWC
+        if(dataPointWC){
+            for(var idp in dataPointWC){
+                var op = dataPointWC[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    var name = op.name;
+                    drawCircle(idp, x, y, name, '5');
+                }
+            }
+        }
+        //draw dataPointTK
+        if(dataPointTK){
+            for(var idp in dataPointTK){
+                var op = dataPointTK[idp];
+                if(op){
+                    // convert coordinate of image to coordinate of View SVG.
+                    var x = (op.x * WV) / WI;
+                    var y = (op.y * HV) / HI;
+                    var name = op.name;
+                    drawCircle(idp, x, y, name, '6');
+                }
+            }
+        }
+        
+    }
+    
+    function hideAllType(){
+        $('#divbooth').hide();
+        $('#divelevator').hide();
+        $('#divescalator').hide();
+        $('#divbeacon').hide();
+        $('#divwc').hide();
+        $('#divtk').hide();
+    }
+    
+    function changeType(){
+        var type = $('#type').val();
+        if(type == '0'){
+            hideAllType();
+        } else if(type == '1'){
+            hideAllType();
+            $('#divbooth').show();
+        } else if(type == '2'){
+            hideAllType();
+            $('#divelevator').show();
+        } else if(type == '3'){
+            hideAllType();
+            $('#divescalator').show();
+        } else if(type == '4'){
+            hideAllType();
+            $('#divbeacon').show();
+        } else if(type == '5'){
+            hideAllType();
+            $('#divwc').show();
+        } else if(type == '6'){
+            hideAllType();
+            $('#divtk').show();
+        }
+    }
+</script>
+{{/SS_MAP}}
+
+        </div>
+        <div class="col-xs-2">
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #009688;"></span>
+                <span class="text">Old Point</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #ae2;"></span>
+                <span class="text">New Point</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #9C27B0;"></span>
+                <span class="text">Booth</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #3F51B5;"></span>
+                <span class="text">Elevator</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #00BCD4;"></span>
+                <span class="text">Escalator</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #F43636;"></span>
+                <span class="text">Beacon</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #FFEB3B;"></span>
+                <span class="text">WC</span>
+            </span>
+            <br>
+            <span class="summary">
+                <span class="badge mail-tag" style="background-color: #607D8B;"></span>
+                <span class="text">Talk</span>
+            </span>
+            
+        </div>
+    </div>
+    
+{{#SS_MAP}}
+    <div class="col-xs-12">
+        <div class="col-xs-3"></div>
+        <div class="col-xs-9">
+            <button id="zoomIn" onclick="zoomIn()">Zoom In [+]</button>
+            <button id="zoomOut" onclick="zoomOut()">Zoom Out [-]</button>
+            <button id="moveLeft" onclick="moveDrawLeft()">Move Left</button>
+            <button id="moveRight" onclick="moveDrawRight()">Move Right</button>
+            <button id="moveTop" onclick="moveDrawTop()">Move Top</button>
+            <button id="moveBottom" onclick="moveDrawBottom()">Move Bottom</button>
+            <button id="showHideLabel" onclick="showHideLabel()">Hide Label</button>
+            <button id="saveMap" onclick="saveMap()">Save</button>
+        </div>
+        <!--<div class="col-xs-2"></div>-->
+    </div>
+{{/SS_MAP}}
+</div>
+
+<div id="dialog-message" class="hide">
+    <iframe id="if_AL" name="if_AL" style="display: none;width: 0px;height: 0px"></iframe>
+    <form id="frmAL" name="frmAL" class="form-horizontal" role="form" action="/web/admin/map" method="POST" target="if_AL">
+        <div id="al_alert_err" class="alert alert-danger" style="display: none;"></div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Type: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="type" name="type" data-placeholder="Choose a type..." onchange="changeType(); return false;">
+                        <option value="0" selected>Navigation point</option>
+                        <option value="1">Booth</option>
+                        <option value="2">Elevator</option>
+                        <option value="3">Escalator</option>
+                        <option value="4">Beacon</option>
+                        <option value="5">WC</option>
+                        <option value="6">Talk</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="divbooth" style="display: none;">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Booth: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="bthid" name="bthid" data-placeholder="Choose a booth...">
+                        <option value=""> Choose a booth... </option>
+                        {{#loop_option_booth}}
+                        <option value="{{KEY}}">{{VALUE}}</option>
+                        {{/loop_option_booth}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="divelevator" style="display: none;">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Elevator: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="eleid" name="eleid" data-placeholder="Choose a elevator...">
+                        <option value=""> Choose a elevator... </option>
+                        {{#loop_option_elevator}}
+                        <option value="{{KEY}}">{{VALUE}}</option>
+                        {{/loop_option_elevator}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="divescalator" style="display: none;">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Escalator: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="escid" name="escid" data-placeholder="Choose a escalator...">
+                        <option value=""> Choose a escalator... </option>
+                        {{#loop_option_escalator}}
+                        <option value="{{KEY}}">{{VALUE}}</option>
+                        {{/loop_option_escalator}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="divbeacon" style="display: none;">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Beacon: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="bcid" name="bcid" data-placeholder="Choose a beacon...">
+                        <option value=""> Choose a beacon... </option>
+                        {{#loop_option_beacon}}
+                        <option value="{{KEY}}">{{VALUE}}</option>
+                        {{/loop_option_beacon}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="divwc" style="display: none;">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">WC: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="wcid" name="wcid" data-placeholder="Choose a water closet...">
+                        <option value=""> Choose a water closet... </option>
+                        {{#loop_option_wc}}
+                        <option value="{{KEY}}">{{VALUE}}</option>
+                        {{/loop_option_wc}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="divtk" style="display: none;">
+            <label class="col-sm-4 control-label no-padding-right" for="form-field-1">Talk: <span class="orange">(*)</span></label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-12" style="margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+                    <select class="col-xs-12 col-sm-12" id="tkid" name="tkid" data-placeholder="Choose a talk...">
+                        <option value=""> Choose a talk... </option>
+                        {{#loop_option_tk}}
+                        <option value="{{KEY}}">{{VALUE}}</option>
+                        {{/loop_option_tk}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="bidev" name="bidev" value="{{EID}}"/>
+        <input type="hidden" id="bidfl" name="bidfl" value="{{FID}}"/>
+        <input type="hidden" id="idlc" name="idlc" value=""/>
+        <input type="hidden" id="lx" name="lx" value=""/>
+        <input type="hidden" id="ly" name="ly" value=""/>
+        <input type="hidden" id="ix" name="ix" value=""/>
+        <input type="hidden" id="iy" name="iy" value=""/>
+    </form>
+</div>
+
+<div id="dialog-save" class="hide">
+    <iframe id="if_SAVE" name="if_SAVE" style="display: none;width: 0px;height: 0px"></iframe>
+    <form id="frmSAVE" name="frmSAVE" class="form-horizontal" role="form" action="/web/admin/map" method="POST" target="if_SAVE">
+        <div id="save_alert_success" class="alert alert-success" style="display: none;"></div>
+        <div id="save_alert_err" class="alert alert-danger" style="display: none;"></div>
+        <div class="form-group">
+            <p id="ooInfo" class="alert alert-warning">Are you sure you want to save map?</p>
+        </div>
+        <input type="hidden" id="idev" name="idev" value="{{EID}}"/>
+        <input type="hidden" id="idfl" name="idfl" value="{{FID}}"/>
+        <input type="hidden" id="anp" name="anp" value=""/>
+        <input type="hidden" id="dop" name="dop" value=""/>
+        <input type="hidden" id="ane" name="ane" value=""/>
+        <input type="hidden" id="doe" name="doe" value=""/>
+        
+        <input type="hidden" id="abth" name="abth" value=""/>
+        <input type="hidden" id="dbth" name="dbth" value=""/>
+        <input type="hidden" id="aele" name="aele" value=""/>
+        <input type="hidden" id="dele" name="dele" value=""/>
+        <input type="hidden" id="aesc" name="aesc" value=""/>
+        <input type="hidden" id="desc" name="desc" value=""/>
+        <input type="hidden" id="abc" name="abc" value=""/>
+        <input type="hidden" id="dbc" name="dbc" value=""/>
+        <input type="hidden" id="awc" name="awc" value=""/>
+        <input type="hidden" id="dwc" name="dwc" value=""/>
+        <input type="hidden" id="atk" name="atk" value=""/>
+        <input type="hidden" id="dtk" name="dtk" value=""/>
+        
+        <input type="hidden" id="action" name="action" value="savemap"/>
+        <input type="hidden" id="callback" name="callback" value="completeSaveMap"/>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-xs-12" style="">
+        <!--<img src="{{static-domain}}/map/mapdemo.svg" alt="map" width="1024" height="768"/>-->
+    </div>
+</div>
+	</div>
+</body>
+</html>

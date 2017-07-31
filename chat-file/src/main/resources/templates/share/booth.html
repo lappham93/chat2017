@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="share/layout">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div th:if="${booth != null}">
+			<h4 class="share-title" th:text="${booth.name}">Saocoo Booth</h4>
+			<div class="col-lg-12 booth">
+				<img class="thumb" alt="event thumb" th:src="${booth.photo}" style="max-width: 80%"/>
+				<div>
+					<span class="like" th:text="${booth.totalLike + ' Likes'}"></span>&nbsp;&nbsp;
+					<span class="view" th:text="${booth.totalView + ' Views'}"></span>&nbsp;&nbsp;
+				</div>
+				<div class="item">
+					<span class="title"></span><span class="desc" th:text="${booth.desc}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Event: </span><span class="event" th:text="${event.name}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Website: </span><a class="web" th:href="${booth.site}" th:text="${booth.site}"></a><br/>
+				</div>
+				<div class="item">
+					<span class="title">Phone: </span><span class="phone" th:text="${booth.phone}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Address: </span><span class="address" th:text="${event.address.addressLine1 + ', ' + (event.address.city != null ? event.address.city : '-') + ', ' + (event.address.state != null ? event.address.state : '-')}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Time: </span><span class="time" th:text="${startTime + ' - ' + endTime}"></span><br/>
+				</div>
+				<div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>    
+</html>

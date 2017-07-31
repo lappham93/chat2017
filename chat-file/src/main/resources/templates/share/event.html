@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="share/layout">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div th:if="${event != null}">
+			<h4 class="share-title" th:text="${event.name	}">Saocoo Event</h4>
+			<div class="col-lg-12 event">
+				<img class="thumb" alt="event thumb" th:src="${event.photo}" style="max-width: 80%"/>
+				<div>
+					<span class="follow" th:text="${event.totalFollow + ' Followers'}"></span>&nbsp;&nbsp;
+					<span class="status" th:text="${event_status.name}"></span>
+				</div>
+				<div class="item">
+					<span class="title"></span><span class="desc" th:text="${event.desc}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Address: </span><span class="address" th:text="${event.address.addressLine1 + ', ' + (event.address.city != null ? event.address.city : '-') + ', ' + (event.address.state != null ? event.address.state : '-')}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Phone: </span><span class="phone" th:text="${event.address.phone}"></span><br/>
+				</div>
+				<div class="item">
+					<span class="title">Business Hours: </span><br/>
+					<div th:each="bh: ${businessHour}">
+						<span th:each="day, dayStatus:${bh.value}" th:text="${dayStatus.last ? day : day + ', '}"></span>
+						<span th:text="${': ' + bh.key}"></span>
+					</div>
+				</div>
+				<div class="item">
+					<span class="title">Time: </span><span class="time" th:text="${startTime + ' - ' + endTime}"></span><br/>
+				</div>
+				<div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>    
+</html>

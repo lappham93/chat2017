@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="header_layout">
+<head>
+</head>
+
+<body>
+	<div layout:fragment="body">
+		<!-- Main navbar -->
+		<div class="navbar navbar-inverse bg-indigo">
+			<div class="navbar-header">
+				<a class="navbar-brand" th:href="@{${admin_prefix}}"><img th:src="@{${resources_path} + '/images/app-logo.png'}" alt=""/></a>
+	
+				<ul class="nav navbar-nav visible-xs-block">
+					<li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+					<li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
+				</ul>
+			</div>
+	
+			<div class="navbar-collapse collapse" id="navbar-mobile">
+				 <ul class="nav navbar-nav">
+					<li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
+				</ul> 
+	
+				<div class="navbar-right">
+					<p class="navbar-text">Welcome <span th:if="${admin_name != null}" th:text="${admin_name}"></span>!</p>
+					<ul class="nav navbar-nav">				
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<i class="caret"></i>
+							</a>
+	
+							<div class="dropdown-menu dropdown-content" style="z-index: 1;">
+								<ul class="media-list dropdown-content-body width-150">
+									<li><a th:href="@{${admin_prefix} + '/logout'}"><i class="icon-switch2"></i><span> Logout</span></a></li>
+								</ul>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- /main navbar -->
+	
+		<!-- Page container -->
+		<div class="page-container">
+	
+			<!-- Page content -->
+			<div class="page-content">
+	
+				<!-- Main sidebar -->
+				<div class="sidebar sidebar-main">
+					<div class="sidebar-content">
+	
+						<!-- User menu -->
+						<div class="sidebar-user">
+							<div class="category-content">
+								<div class="sidebar-user-material-content">
+									<a href="#"><img th:src="${resources_path} + '/limitless/images/placeholder.jpg'" class="img-circle img-responsive" alt=""/></a>
+									<h5 th:text="${admin_title} + ' Admin'">Homber Admin</h5>
+									<h6 th:text="${admin_role}">System Admin</h6>
+									<span class="text-size-small"></span>
+								</div>
+															
+								<!-- <div class="sidebar-user-material-menu">
+									<a href="#user-nav" data-toggle="collapse"><span>My account</span> <i class="caret"></i></a>
+								</div> -->
+							</div>
+							
+							<!-- <div class="navigation-wrapper collapse" id="user-nav">
+								<ul class="navigation">
+									<li><a href="#"><i class="icon-user-plus"></i> <span>My profile</span></a></li>
+									<li><a href="#"><i class="icon-coins"></i> <span>My balance</span></a></li>
+									<li><a href="#"><i class="icon-comment-discussion"></i> <span><span class="badge bg-teal-400 pull-right">58</span> Messages</span></a></li>
+									<li class="divider"></li>
+									<li><a href="#"><i class="icon-cog5"></i> <span>Account settings</span></a></li>
+									<li><a href="#"><i class="icon-switch2"></i> <span>Logout</span></a></li>
+								</ul>
+							</div> -->
+						</div>
+						<!-- /user menu -->
+	
+	
+						<!-- Main navigation -->
+						<div class="sidebar-category sidebar-category-visible">
+							<div class="category-content no-padding">
+								<ul class="navigation navigation-main navigation-accordion">
+									<li th:class="${isDashboardTab} ? active"><a th:href="@{${admin_prefix}}"><i class="icon-home4"></i> <span>Dashboard</span></a></li>
+									<li th:class="${isCustomerTab} ? active"><a th:href="@{${admin_prefix} + '/customer'}"><i class="icon-users4"></i> <span>Customer</span></a></li>
+									<li th:class="${isEyebrowTab} ? active"><a th:href="@{${admin_prefix} + '/eyebrow'}"><i class="icon-eye4"></i> <span>Eyebrow</span></a></li>
+									<li th:class="${isBannerTab} ? active"><a th:href="@{${admin_prefix} + '/banner'}"><i class="icon-file-empty2"></i> <span>Banner</span></a></li>
+									<li th:class="${isNotificationTab} ? active"><a th:href="@{${admin_prefix} + '/notification'}"><i class="icon-station"></i> <span>Notification</span></a></li>	
+									<li th:class="${isAppConstantTab} ? active"><a th:href="@{${admin_prefix} + '/app-constant'}"><i class="icon-gear"></i> <span>App Constant</span></a></li>
+									<!-- <li th:class="${isAddressTab} ? active"><a th:href="@{${admin_prefix} + '/address/state'}"><i class="icon-city"></i> <span>Address</span></a></li>
+									<li th:class="${isFeedbackTab} ? active"><a th:href="@{${admin_prefix} + '/feedback/feed'}"><i class="icon-profile"></i> <span>Feedback</span></a></li>
+									<li th:class="${isAdvertisementTab} ? active"><a th:href="@{${admin_prefix} + '/adv'}"><i class="icon-video-camera"></i> <span>Advertisement</span></a></li>
+									<li th:class="${isEventTab} ? active"><a th:href="@{${admin_prefix} + '/event/event'}"><i class="icon-calendar3"></i> <span>Event</span></a></li>
+									<li th:class="${isBoothTab} ? active"><a th:href="@{${admin_prefix} + '/booth/booth'}"><i class="icon-pyramid2"></i> <span>Booth</span></a></li>
+									<li th:class="${isProductTab} ? active"><a th:href="@{${admin_prefix} + '/product'}"><i class="icon-dice"></i> <span>Product</span></a></li>
+									<li th:class="${isTalkTab} ? active"><a th:href="@{${admin_prefix} + '/talk'}"><i class="icon-bubble9"></i> <span>Talk</span></a></li>
+									<li th:class="${isMapTab} ? active"><a th:href="@{${admin_prefix} + '/map'}"><i class="icon-location3"></i> <span>Map</span></a></li> -->
+								</ul>
+							</div>
+						</div>
+						<!-- /main navigation -->
+	
+					</div>
+				</div>
+				<!-- /main sidebar -->
+	
+	
+				<!-- Main content -->
+				<div class="content-wrapper">
+	
+					<!-- Page header -->
+					<div class="page-header page-header-default">
+						<!-- <div class="page-header-content">
+							<div class="page-title">
+								<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Home</span> - Dashboard</h4>
+							</div>
+	
+							<div class="heading-elements">
+								<div class="heading-btn-group">
+									<a href="#" class="btn btn-link btn-float text-size-small has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
+									<a href="#" class="btn btn-link btn-float text-size-small has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
+									<a href="#" class="btn btn-link btn-float text-size-small has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
+								</div>
+							</div>
+						</div> -->
+	
+						<div class="breadcrumb-line">
+							<ul class="breadcrumb">
+								<li><a th:href="@{${admin_prefix}}"><i class="icon-home2 position-left"></i> Home</a></li>
+								<li class="active" th:text="${breadcrumbTxt}"></li>
+							</ul>
+	
+							<!-- <ul class="breadcrumb-elements">
+								<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="icon-gear position-left"></i>
+										Settings
+										<span class="caret"></span>
+									</a>
+	
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+										<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+										<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+										<li class="divider"></li>
+										<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+									</ul>
+								</li>
+							</ul> -->
+						</div>
+					</div>
+					<!-- /page header -->
+					<!-- second navbar -->
+			        <div layout:fragment="second_navbar" style="z-index: 2"></div>
+					<!-- /second navbar -->
+	
+					<!-- Content area -->
+					<div class="content">
+						<!-- Dashboard content -->
+						<div class="container col-sm-12">
+					        <div layout:fragment="content"></div>
+					    </div>
+						<!-- /Dashboard content -->
+						<!-- Footer -->
+						<div class="footer text-muted">
+							&copy; 2017. Beauty Queen
+						</div>
+						<!-- /footer -->
+	
+					</div>
+					<!-- /content area -->
+	
+				</div>
+				<!-- /main content -->
+	
+			</div>
+			<!-- /page content -->
+	
+		</div>
+		<!-- /page container -->
+	</div>
+</body>
+</html>

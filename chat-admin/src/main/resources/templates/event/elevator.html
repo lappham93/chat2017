@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="event/event_layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/elevator.js'"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding event form -->
+		<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h5 class="panel-title">Add Elevator</h5>
+					<div class="heading-elements">	
+						<ul class="icons-list">
+							<li><a data-action="collapse"></a></li>
+						</ul>
+					</div>
+				</div>
+				<form id="addElevatorFrmId" class="form-horizontal">
+					<div th:replace="fragments/fragments :: form_error_2"></div>
+					<div th:replace="fragments/fragments :: form_success_2"></div>
+					<div th:replace="fragments/fragments :: loader"></div>
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<select id="eventAddSltId" class="select" required="required" data-placeholder="Select event">
+									<option disabled="disabled" selected="selected" value="">Select event</option>
+									<option th:each="event: ${events}" th:if="${event.active}" th:value="${event.id}" th:text="${event.name}"></option>
+								</select>
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="text" id="nameAddIptId" class="form-control" required="required" placeholder="Name" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">From Floor: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<select id="fromFloorAddSltId" class="select" required="required" data-placeholder="Select floor">
+									<option disabled="disabled" selected="selected" value="">Select floor</option>
+								</select>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">To Floor: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<select id="toFloorAddSltId" class="select" required="required" data-placeholder="Select floor">
+									<option disabled="disabled" selected="selected" value="">Select floor</option>
+								</select>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Is Active: </label>
+							<div class="col-lg-9">
+								<div class="checkbox checkbox-switch">
+									<input type="checkbox" id="activeAddIptId" class="switch" data-on-text="On" 
+										data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+								</div>
+							</div>
+						</div>
+						
+						<div class="text-right">
+							<button class="btn bg-pink-400" id="addElevatorBtnId"> Add<i class="icon-circle-right2 position-right"></i></button>
+						</div>
+					</div>
+				</form>
+			</div>
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Elevator List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<div class="table-filter">
+				<div class="form-group">
+					<div class="col-lg-4">
+						<select id="eventSearchSltId" class="select" required="required" data-placeholder="Select event">
+							<option selected="selected" value="0">All Events</option>
+							<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}" th:selected="${event.id == eventSelect} ? selected"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th data-toggle="true">No</th>
+						<th>Name</th>
+						<th data-hide="phone">Event</th>
+						<th data-hide="phone">From Floor</th>
+						<th data-hide="phone">To Floor</th>
+						<th data-hide="phone">Update</th>
+						<th data-hide="phone">Status</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="elevator, elevatorStatus : ${elevators}">
+						<td th:text="${elevatorStatus.count + pagingFrom}"></td>
+						<td th:text="${elevator.name}"></td>
+						<td th:text="${elevator.event.name}"></td>
+						<td th:text="${elevator.fromFloor.name}"></td>
+						<td th:text="${elevator.toFloor.name}"></td>
+						<td th:text="${elevator.active ? 'Active' : 'Inactive'}"
+							th:class="${elevator.active ? 'text-primary-600' : 'text-danger-600'}"></td>
+						<td th:text="${elevator.updatedDate}"></td>
+						<td width="10%">
+							<ul class="icons-list large-device text-center">
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Edit" th:onclick="'openElevatorEditModal(\''+${elevator.id}+'\')'"><i class="icon-pencil7"></i></a></li>
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Delete" th:onclick="'openElevatorDeleteModal(\''+${elevator.id}+'\')'"><i class="icon-trash"></i></a></li>
+							</ul>
+							<ul class="list list-inline small-device">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" th:onclick="'openElevatorEditModal(\''+${elevator.id}+'\')'"><i class="icon-pencil7"></i>Edit</a></li>
+										<li><a href="#" data-toggle="modal" th:onclick="'openElevatorDeleteModal(\''+${elevator.id}+'\')'"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div th:replace="fragments/fragments :: simple-paging"></div>
+		</div>
+		<!-- /row toggler -->
+		<!-- Edit Modal -->
+		<div id="editElevatorMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Edit Elevator</h5>
+					</div>
+					<div class="modal-body">
+						<form id="editElevatorFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="eventEditSltId" class="select" required="required" data-placeholder="Select event">
+											<option disabled="disabled" selected="selected" value="">Select event</option>
+											<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="nameEditIptId" class="form-control" required="required" placeholder="Name" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">From Floor: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="fromFloorEditSltId" class="select" required="required" data-placeholder="Select floor">
+											<option disabled="disabled" selected="selected" value="">Select floor</option>
+										</select>
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">To Floor: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="toFloorEditSltId" class="select" required="required" data-placeholder="Select floor">
+											<option disabled="disabled" selected="selected" value="">Select floor</option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Active: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="activeEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="idEditIptId" />
+								<button type="submit" id="editElevatorBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitEditElevator()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Edit Modal -->
+		
+		<!-- Delete Modal -->
+		<div id="deleteElevatorMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Delete Elevator</h5>
+					</div>
+					<div class="modal-body">
+						<form id="deleteElevatorFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idDeleteIptId" />
+								<button type="submit" id="deleteElevatorBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitDeleteElevator()">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Delete Modal -->
+	</div>
+</body>
+</html>

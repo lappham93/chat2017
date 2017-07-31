@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="event/event_layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/floor.js'"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding event form -->
+		<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h5 class="panel-title">Add Floor</h5>
+					<div class="heading-elements">	
+						<ul class="icons-list">
+							<li><a data-action="collapse"></a></li>
+						</ul>
+					</div>
+				</div>
+				<form id="addFloorFrmId" class="form-horizontal">
+					<div th:replace="fragments/fragments :: form_error_2"></div>
+					<div th:replace="fragments/fragments :: form_success_2"></div>
+					<div th:replace="fragments/fragments :: loader"></div>
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="col-lg-3 control-label">AtlasId: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="text" id="atlasIdAddIptId" class="form-control" required="required" placeholder="Atlas Id" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<select id="eventAddSltId" class="select" required="required" data-placeholder="Select event">
+									<option disabled="disabled" selected="selected" value="">Select event</option>
+									<option th:each="event: ${events}" th:if="${event.active}" th:value="${event.id}" th:text="${event.name}"></option>
+								</select>
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="text" id="nameAddIptId" class="form-control" required="required" placeholder="Name" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Number: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="text" id="numberAddIptId"  class="touchspin-display-order" required="required" value="1"/>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Width (meter): <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="number" id="widthAddIptId" min="0" step="any" class="form-control" required="required" placeholder="Width" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Height (meter): <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="number" id="heightAddIptId" min="0" step="any" class="form-control" required="required" placeholder="Height" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Offset Rotation (degree): <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="number" id="rotateAddIptId" step="any" class="form-control" required="required" placeholder="Offset Rotation" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Is Active: </label>
+							<div class="col-lg-9">
+								<div class="checkbox checkbox-switch">
+									<input type="checkbox" id="activeAddIptId" class="switch" data-on-text="On" 
+										data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Photo: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="file" id="photoIptId" class="file-styled" required="required" accept="image/*"/>
+							</div>
+						</div>
+						
+						<div class="text-right">
+							<button class="btn bg-pink-400" id="addFloorBtnId"> Add<i class="icon-circle-right2 position-right"></i></button>
+						</div>
+					</div>
+				</form>
+			</div>
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Floor List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<div class="table-filter">
+				<div class="form-group">
+					<div class="col-lg-4">
+						<select id="eventSearchSltId" class="select" required="required" data-placeholder="Select event">
+							<option selected="selected" value="0">All Events</option>
+							<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}" th:selected="${event.id == eventSelect} ? selected"></option>
+						</select>
+					</div>
+					<!-- <div class="col-lg-2">
+						<button class="btn btn-default bootstrap-touchspin-up" id="searchBtnId" onclick="search()"><i class="icon-search4"></i></button>
+					</div> -->
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th data-toggle="true">No</th>
+						<th data-hide="phone,tablet">Photo</th>
+						<!-- <th data-hide="all">Other Photos</th> -->
+						<th>Name</th>
+						<th data-hide="phone">Event</th>
+						<th data-hide="phone" width="20%">Info</th>
+						<th data-hide="phone">Status</th>
+						<th data-hide="phone">Update</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="floor, floorStatus : ${floors}">
+						<td th:text="${floorStatus.count + pagingFrom}"></td>
+						<td width="15%">
+							<div class="thumbnail">
+								<div class="thumb">
+									<img th:src="@{${floor.photo}}" alt=""/>
+									<div class="caption-overflow">
+										<span>
+											<a th:onclick="'App.imagePopup(\''+${floor.photo}+'\',\'Photo\')'" class="btn bg-warning-300 btn-icon"><i class="icon-zoomin3"></i></a>
+											<a th:onclick="'openPhotoEditModal(\''+${floor.id}+'\')'" class="btn btn-info btn-sm" >Change</a>
+										</span>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td th:text="${floor.name}"></td>
+						<td th:text="${floor.event.name}"></td>
+						<td>
+							&nbsp; <strong>AtlasId: </strong><span th:text="${floor.atlasId}"></span><br/>
+							&nbsp; <strong>Number: </strong><span th:text="${floor.number}"></span><br/>
+							&nbsp; <strong>Number of Level: </strong><span th:text="${floor.numLevel}"></span><br/>
+							&nbsp; <strong>Actual Size (WxH): </strong><span th:text="${floor.actualWidth + 'x' + floor.actualHeight}"></span><br/>
+							&nbsp; <strong>Image Size (WxH): </strong><span th:text="${floor.pxWidth + 'x' + floor.pxHeight}"></span><br/>
+							&nbsp; <strong>Offset Rotation: </strong><span th:text="${floor.rotate}"></span><br/>
+						</td>
+						<td th:text="${floor.active ? 'Active' : 'Inactive'}"
+							th:class="${floor.active ? 'text-primary-600' : 'text-danger-600'}"></td>
+						<td th:text="${floor.updatedDate}"></td>
+						<td width="10%">
+							<ul class="icons-list large-device text-center">
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Edit" th:onclick="'openFloorEditModal(\''+${floor.id}+'\')'"><i class="icon-pencil7"></i></a></li>
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Delete" th:onclick="'openFloorDeleteModal(\''+${floor.id}+'\')'"><i class="icon-trash"></i></a></li>
+							</ul>
+							<ul class="list list-inline small-device">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" th:onclick="'openFloorEditModal(\''+${floor.id}+'\')'"><i class="icon-pencil7"></i>Edit</a></li>
+										<li><a href="#" data-toggle="modal" th:onclick="'openFloorDeleteModal(\''+${floor.id}+'\')'"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div th:replace="fragments/fragments :: simple-paging"></div>
+		</div>
+		<!-- /row toggler -->
+		<!-- Edit Modal -->
+		<div id="editFloorMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Edit Floor</h5>
+					</div>
+					<div class="modal-body">
+						<form id="editFloorFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-lg-3 control-label">AtlasId: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="atlasIdEditIptId" class="form-control" required="required" placeholder="AtlasId" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="eventEditSltId" class="select" required="required" data-placeholder="Select event">
+											<option disabled="disabled" selected="selected" value="">Select event</option>
+											<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="nameEditIptId" class="form-control" required="required" placeholder="Name" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Number: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="numberEditIptId"  class="touchspin-display-order" required="required" value="1"/>
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Width (meter): <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="number" id="widthEditIptId" min="0" step="any" class="form-control" required="required" placeholder="Width" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Height (meter): <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="number" id="heightEditIptId" min="0" step="any" class="form-control" required="required" placeholder="Height" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Offset Rotation (degree): <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="number" id="rotateEditIptId" step="any" class="form-control" required="required" placeholder="Offset Rotation" />
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Active: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="activeEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="idEditIptId" />
+								<button type="submit" id="editFloorBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitEditFloor()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Edit Modal -->
+		
+		<!-- Delete Modal -->
+		<div id="deleteFloorMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Delete Floor</h5>
+					</div>
+					<div class="modal-body">
+						<form id="deleteFloorFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idDeleteIptId" />
+								<button type="submit" id="deleteFloorBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitDeleteFloor()">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Delete Modal -->
+		<!-- Change image Modal -->
+		<div th:replace="fragments/fragments :: change_photo_modal"></div>
+		<!-- /Change image Modal -->
+	</div>
+</body>
+</html>

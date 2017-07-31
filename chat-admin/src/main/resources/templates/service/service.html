@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="service/service_layout">
+<head>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/* zipCodes = [[${zipcodes}]]; */
+		addPrices = {};
+		/*]]>*/
+	</script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding service form -->
+		<div th:if="${admin_type == system_admin_type}">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h5 class="panel-title">Add Service</h5>
+					<div class="heading-elements">	
+						<ul class="icons-list">
+							<li><a data-action="collapse"></a></li>
+						</ul>
+					</div>
+				</div>
+				<form id="addServiceFrmId" class="form-horizontal">
+					<div th:replace="fragments/fragments :: form_error_2"></div>
+					<div th:replace="fragments/fragments :: form_success_2"></div>
+					<div th:replace="fragments/fragments :: loader"></div>
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Category: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<select id="cateAddSltId" class="select" required="required" data-placeholder="Select category">
+									<option disabled="disabled" selected="selected" value="">Select category</option>
+									<option th:each="cate: ${categories}" th:value="${cate.id}" th:text="${cate.name}"></option>
+								</select>
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="text" id="nameAddIptId" class="form-control" required="required" placeholder="Name" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Description: </label>
+							<div class="col-lg-9">
+								<input type="text" id="descAddIptId" class="form-control" placeholder="Description" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Default Price (per square feed): <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="number" id="defaultPriceAddIptId" class="form-control" required="required" step="any" placeholder="Default Price" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="col-lg-offset-3 col-lg-9">
+								<a href="#" onclick="openAddPriceList()">Detail Prices List</a>
+							</div>
+						</div>
+						
+						<!-- <div class="form-group">
+							<label class="col-lg-3 control-label">Price (per square feet): </label>
+							<div class="col-lg-3">
+								<select id="stateAddSltId" class="select" data-placeholder="Select State">
+									<option disabled="disabled" selected="selected" value="">Select State</option>
+									<option th:each="state: ${states}" th:value="${state.code}" th:text="${state.name}"></option>
+								</select>
+							</div>
+							<div class="col-lg-3 multi-select-full">
+								<select id="zipcodeAddSltId" class="multiselect-full-featured" multiple="multiple" data-placeholder="Select Place - ZipCode(s)">
+								</select>
+							</div>
+							<div class="col-lg-2">
+									<input type="number" id="priceAddIptId" class="form-control" step="any" placeholder="Price" />
+							</div>
+							<div id="addMsgId" class="alert alert-success col-lg-offset-3 col-lg-6" style="display:none; position: absolute;">Added to Prices List</div>
+							<div class="col-lg-1">
+								<button id="addPriceBtnId" class="btn btn-default bootstrap-touchspin-up" type="button" disabled="disabled" title="Add" style="width:0px" onclick="addPrices()"><i class="icon-add" style="margin-left: -8px"></i></button>
+								<button class="btn btn-default bootstrap-touchspin-up" type="button" title="List" style="width:0px" onclick="listAddPrices()"><i class="icon-list" style="margin-left: -8px"></i></button>
+							</div>
+						</div> -->
+	
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Display Order: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="text" id="disOrderAddIptId"  class="touchspin-display-order" required="required" value="1"/>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Is Default: </label>
+							<div class="col-lg-9">
+								<div class="checkbox checkbox-switch">
+									<input type="checkbox" id="defaultAddIptId" class="switch" data-on-text="On" 
+										data-off-text="Off" data-on-color="primary" data-off-color="default"/>
+								</div>
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Is Active: </label>
+							<div class="col-lg-9">
+								<div class="checkbox checkbox-switch">
+									<input type="checkbox" id="activeAddIptId" class="switch" data-on-text="On" 
+										data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Photo: <span class="text-danger">(*)</span></label>
+							<div class="col-lg-9">
+								<input type="file" id="photoIptId" class="file-styled" required="required" accept="image/*"/>
+							</div>
+						</div>
+						<input type="hidden" name="type" value="1"/>
+						
+						<div class="text-right">
+							<button class="btn bg-pink-400" id="addServiceBtnId"> Add<i class="icon-circle-right2 position-right"></i></button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Service List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th>No</th>
+						<th data-hide="phone,tablet">Photo</th>
+						<th data-hide="phone">Category</th>
+						<th data-toggle="true">Name</th>
+						<th data-toggle="phone,tablet" width="20%">Description</th>
+						<th data-hide="phone">Default Price</th>
+						<th data-hide="phone">Display Order</th>
+						<th data-hide="phone">Status</th>
+						<th data-hide="phone">Update</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="service, serviceStatus : ${services}">
+						<td th:text="${serviceStatus.count + pagingFrom}"></td>
+						<td width="15%">
+							<div class="thumbnail">
+								<div class="thumb">
+									<img th:src="@{${service.photo}}" alt=""/>
+									<div class="caption-overflow">
+										<span>
+											<a th:onclick="'App.imagePopup(\''+${service.photo}+'\',\'Photo\')'" class="btn bg-warning-300 btn-icon" data-popup="lightbox"><i class="icon-zoomin3"></i></a>
+											<a th:onclick="'openPhotoEditModal(\''+${service.id}+'\')'" class="btn btn-info btn-sm" th:if="${admin_type == system_admin_type}">Change</a>
+										</span>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td th:text="${service.serviceCate.name}"></td>
+						<td th:text="${service.name}"></td>
+						<td>
+							&nbsp; <span th:text="${service.description}"></span><br/>
+							&nbsp; <span th:if="${service.default}" class="text-primary-600">Default Service</span>
+						</td>
+						<td th:text="${service.basePrice}"></td>
+						<td th:text="${service.displayOrder}"></td>
+						<td th:text="${service.active ? 'Active' : 'Inactive'}"
+							th:class="${service.active ? 'text-primary-600' : 'text-danger-600'}"></td>
+						<td th:text="${service.updatedDate}"></td>
+						<td width="10%">
+							<ul class="icons-list large-device text-center">
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Edit Prices" th:onclick="'openEditPriceList(\''+${service.id}+'\')'"><i class="icon-list"></i></a></li>
+								<li th:if="${admin_type == system_admin_type}"><a href="#" data-toggle="modal" data-popup="tooltip" title="Edit" th:onclick="'openServiceEditModal(\''+${service.id}+'\')'"><i class="icon-pencil7"></i></a></li>
+								<li th:if="${admin_type == system_admin_type}"><a href="#" data-toggle="modal" data-popup="tooltip" title="Delete" th:onclick="'openServiceDeleteModal(\''+${service.id}+'\')'"><i class="icon-trash"></i></a></li>
+							</ul>
+							<ul class="list list-inline small-device">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" th:onclick="'openEditPriceList(\''+${service.id}+'\')'"><i class="icon-list"></i>Edit Prices</a></li>
+										<li th:if="${admin_type == system_admin_type}"><a href="#" data-toggle="modal" th:onclick="'openServiceEditModal(\''+${service.id}+'\')'"><i class="icon-pencil7"></i>Edit</a></li>
+										<li th:if="${admin_type == system_admin_type}"><a href="#" data-toggle="modal" th:onclick="'openServiceDeleteModal(\''+${service.id}+'\')'"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div th:replace="fragments/fragments :: simple-paging"></div>
+		</div>
+		<!-- /row toggler -->
+		<!-- Edit Modal -->
+		<div id="editServiceMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Edit Service</h5>
+					</div>
+					<div class="modal-body">
+						<form id="editServiceFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Category: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="cateEditSltId" class="select" required="required" data-placeholder="Select category">
+											<option disabled="disabled" selected="selected" value="">Select category</option>
+											<option th:each="cate: ${categories}" th:value="${cate.id}" th:text="${cate.name}"></option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="nameEditIptId" class="form-control" required="required" placeholder="Name" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Description: </label>
+									<div class="col-lg-9">
+										<input type="text" id="descEditIptId" class="form-control" placeholder="Description" />
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Default Price: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="number" id="priceEditIptId" class="form-control" required="required" step="any" placeholder="Price" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Display Order: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="disOrderEditIptId"  class="touchspin-display-order" required="required" value="1"/>
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Default: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="defaultEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default"/>
+										</div>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Active: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="activeEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="idEditIptId" />
+								<button type="submit" id="editServiceBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitServiceEdit()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Edit Modal -->
+		
+		<!-- Delete Modal -->
+		<div id="deleteServiceMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Delete Service</h5>
+					</div>
+					<div class="modal-body">
+						<form id="deleteServiceFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idDeleteIptId" />
+								<button type="submit" id="deleteServiceBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitServiceDelete()">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Delete Modal -->
+		<!-- Change image Modal -->
+		<div th:replace="fragments/fragments :: change_photo_modal"></div>
+		<!-- /Change image Modal -->
+		<!-- Service Price Modal -->
+		<div id="priceMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Price List</h5>
+					</div>
+					<div class="modal-body">
+						<div th:replace="fragments/fragments :: form_error_2"></div>
+						<div th:replace="fragments/fragments :: form_success_2"></div>
+						<div th:replace="fragments/fragments :: loader"></div>
+						<div class="panel-body">
+							<form id="addPriceFrmId" class="form-horizontal">
+								<div class="form-group">
+									<div class="col-lg-6">
+										<select id="stateAddSltId" class="select" data-placeholder="Select State (*)" required="required">
+											<option disabled="disabled" selected="selected" value="">Select State (*)</option>
+											<option th:each="state: ${states}" th:value="${state.code}" th:text="${state.name}"></option>
+										</select>
+									</div>
+									<div class="col-lg-6 multi-select-full">
+										<select id="zipcodeAddSltId" class="multiselect-full-featured" multiple="multiple" data-placeholder="Select Place - ZipCode(s) (*)">
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-12">
+											<input type="number" id="priceAddIptId" class="form-control" step="any" min="0" placeholder="Price (*)" required="required" onchange="filterValue()"/>
+									</div>
+								</div>	
+								<div class="form-group">
+									<label class="col-lg-5 control-label">Price Automatically Adjusting: </label>
+									<div class="col-lg-7 checkbox checkbox-switch">
+										<input type="checkbox" id="autoAdjustIptId" data-on-text="On" 
+											data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked" onchange="showAdjustDiv()"/>
+									</div>
+								</div>
+								<div id="autoAdjustDivId" class="form-group">
+									<div class="col-lg-6">
+										<input type="number" id="minPriceAddIptId" class="form-control" step="any" min="0" placeholder="Min Price (*)" required="required" onchange="filterValue()"/>
+									</div>
+									<div class="col-lg-6">
+										<input type="number" id="maxPriceAddIptId" class="form-control" step="any" min="0" placeholder="Max Price (*)" required="required" onchange="filterValue()"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-lg-12 control-label">Home Advisor (HA) References: </label>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-6">
+										<input type="number" id="haMinPriceAddIptId" class="form-control" step="any" min="0" placeholder="HA Min Price" />
+									</div>
+									<div class="col-lg-6">
+										<input type="number" id="haMaxPriceAddIptId" class="form-control" step="any" min="0" placeholder="HA Max Price" />
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-4">
+										<input type="number" id="haAvgPriceAddIptId" class="form-control" step="any" min="0" placeholder="HA Average Price" />
+									</div>
+									<div class="col-lg-4">
+										<input type="number" id="haMinAvgPriceAddIptId" class="form-control" step="any" min="0" placeholder="HA Min Average Price" />
+									</div>
+									<div class="col-lg-4">
+										<input type="number" id="haMaxAvgPriceAddIptId" class="form-control" step="any" min="0" placeholder="HA Max Average Price" />
+									</div>
+								</div>
+								
+								<div class="text-right">
+									<button id="addPriceBtnId" class="btn btn-default bootstrap-touchspin-up" type="submit" title="Add" style="width:0px"><i class="icon-add" style="margin-left: -8px"></i></button>
+								</div>
+							</form>
+							
+							<div class="row" style="margin-top: 30px">
+								<div class="col-lg-3">
+									<input type="text" id="priceListSearchIptId" class="form-control" placeholder="search"/>
+								</div>
+								<div id="priceEleId" class="col-lg-12 priceEleClc" style="display: none; margin-top:20px">
+									<div class="form-group">
+										<div class="col-lg-3">
+											<span class="col-lg-12 label border-right-success label-striped label-striped-right placeClc" style="margin-top:10px; margin-left:-20px"></span>
+										</div>
+										<div class="col-lg-8">
+											<div class="col-lg-6">
+												&nbsp; Price: <span class="text-success priceClc"></span><br/>
+												&nbsp; Automatically Adjusting: <span class="text-success autoAdjustClc"></span><br/>
+												&nbsp; Min Price: <span class="text-success minPriceClc"></span><br/>
+												&nbsp; Max Price: <span class="text-success maxPriceClc"></span><br/>
+											</div>
+											<div class="col-lg-6">
+												&nbsp; HA Min Price: <span class="text-success haMinPriceClc"></span><br/>
+												&nbsp; HA Max Price: <span class="text-success haMaxPriceClc"></span><br/>
+												&nbsp; HA Average Price: <span class="text-success haAvgPriceClc"></span><br/>
+												&nbsp; HA Min Average Price: <span class="text-success haMinAvgPriceClc"></span><br/>
+												&nbsp; HA Max Average Price: <span class="text-success haMaxAvgPriceClc"></span><br/>
+											</div>
+										</div>
+										<div class="col-lg-1">
+											<button class="btn btn-default bootstrap-touchspin-up deleteClc" type="button" title="Delete" style="width:0px"><i class="icon-trash" style="margin-left: -8px"></i></button>
+											<button class="btn btn-default bootstrap-touchspin-up cloneClc" type="button" title="Clone" style="width:0px"><i class="icon-copy3" style="margin-left: -8px"></i></button>
+										</div>
+									</div>
+								</div>
+								<div id="priceListId" class="col-lg-12 pre-scrollable">
+								</div>
+							</div>
+							<input type="hidden" id="idPriceIptId"/>
+							<input type="hidden" id="priceModalTypeId"/>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitServicePricesEdit()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Service Price Modal -->
+	</div>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/banner.js'"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding banner form -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Add Banner</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="addBannerFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Display Where: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="objectTypeAddSltId" class="select" required="required" data-placeholder="Select position">
+								<option disabled="disabled" selected="selected" value="">Select position</option>
+								<option th:each="type: ${objectRefs}" th:selected="${type.value==objectRefDefault.value} ? selected" th:value="${type.value}" th:text="${type.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group" id="objectIdEventDivId" style="display: none">
+						<label class="col-lg-3 control-label">In Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="objectIdEventAddSltId" class="select" data-placeholder="Select event">
+								<option disabled="disabled" selected="selected" value="">Select event</option>
+								<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group" id="objectIdBoothDivId" style="display: none">
+						<label class="col-lg-3 control-label">In Booth: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="objectIdBoothAddSltId" class="select" data-placeholder="Select booth">
+								<option disabled="disabled" selected="selected" value="">Select booth</option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Type: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="typeAddSltId" class="select" required="required" data-placeholder="Select type">
+								<option disabled="disabled" selected="selected" value="">Select type</option>
+								<option th:each="type: ${types}" th:value="${type.value}" th:text="${type.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group" id="eventAddDivId" style="display: none">
+						<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="eventAddSltId" class="select" data-placeholder="Select event">
+								<option disabled="disabled" selected="selected" value="">Select event</option>
+								<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group" id="boothAddDivId" style="display: none">
+						<label class="col-lg-3 control-label">Booth: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="boothAddSltId" class="select" data-placeholder="Select booth">
+								<option disabled="disabled" selected="selected" value="">Select booth</option>
+								<option th:each="booth: ${booths}" th:value="${booth.id}" th:text="${booth.name}"></option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Message: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="msgAddIptId" class="form-control" required="required" placeholder="Message" />
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Info: </label>
+						<div class="col-lg-9">
+							<input type="text" id="infoAddIptId" class="form-control" placeholder="Info" />
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Display Order: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="disOrderAddIptId"  class="touchspin-display-order" required="required" value="1"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Is Active: </label>
+						<div class="col-lg-9">
+							<div class="checkbox checkbox-switch">
+								<input type="checkbox" id="activeAddIptId" class="switch" data-on-text="On" 
+									data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+							</div>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Thumb: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="file" id="photoIptId" class="file-styled" required="required" accept="image/*"/>
+						</div>
+					</div>
+					<input type="hidden" name="type" value="1"/>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="addBannerBtnId"> Add<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Banner List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th data-toggle="true">No</th>
+						<th data-hide="phone,tablet">Thumb</th>
+						<th data-hide="phone">Display Where</th>
+						<th>Type</th>
+						<th>Message</th>
+						<th data-hide="phone">Other Info</th>
+						<th data-hide="phone">Status</th>
+						<th data-hide="phone">Update</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="banner, bannerStatus : ${banners}">
+						<td th:text="${bannerStatus.count}"></td>
+						<td width="15%">
+							<div class="thumbnail">
+								<div class="thumb">
+									<img th:src="@{${banner.photo}}" alt=""/>
+									<div class="caption-overflow">
+										<span>
+											<a th:onclick="'App.imagePopup(\''+${banner.photo}+'\',\'Thumb\')'" class="btn bg-warning-300 btn-icon"><i class="icon-zoomin3"></i></a>
+											<a th:onclick="'openPhotoEditModal(\''+${banner.id}+'\')'" class="btn btn-info btn-sm">Change</a>
+										</span>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td>
+							<div th:if="${banner.objectRef.type.value == objectRefs[0].value}">
+								&nbsp; <strong>Home </strong>
+							</div>
+							<div th:if="${banner.objectRef.type.value == objectRefs[1].value}">
+								Event: <span th:text="${banner.objectRef.object.name}"></span>
+								
+							</div>
+							<div th:if="${banner.objectRef.type.value == objectRefs[2].value}">
+								&nbsp; <strong>Event: </strong> <span th:text="${banner.objectRef.object.event.name}"></span> <br/>
+								&nbsp; <strong>Booth: </strong> <span th:text="${banner.objectRef.object.name}"></span>
+							</div>
+						</td>
+						<td th:text="${banner.type.name}"></td>
+						<td th:text="${banner.msg}"></td>
+						<td>
+							<div th:if="${banner.event != null}">
+								&nbsp; <strong>Event: </strong><span th:text="${banner.event.name}"></span><br/>
+							</div>
+							<div th:if="${banner.booth != null}">
+								&nbsp; <strong>Event: </strong><span th:text="${banner.booth.event.name}"></span><br/>
+								&nbsp; <strong>Booth: </strong><span th:text="${banner.booth.name}"></span><br/>
+							</div>
+							&nbsp; <strong>Content: </strong><span th:text="${banner.info}"></span><br/>
+							&nbsp; <strong>Display Order: </strong><span th:text="${banner.displayOrder}"></span>
+						</td>
+						<td th:text="${banner.active ? 'Active' : 'Inactive'}"
+							th:class="${banner.active ? 'text-primary-600' : 'text-danger-600'}"></td>
+						<td th:text="${banner.updatedDate}"></td>
+						<td width="10%">
+							<ul class="icons-list large-device text-center">
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Edit" th:onclick="'openBannerEditModal(\''+${banner.id}+'\')'"><i class="icon-pencil7"></i></a></li>
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Delete" th:onclick="'openBannerDeleteModal(\''+${banner.id}+'\')'"><i class="icon-trash"></i></a></li>
+							</ul>
+							<ul class="list list-inline small-device">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" th:onclick="'openBannerEditModal(\''+${banner.id}+'\')'"><i class="icon-pencil7"></i>Edit</a></li>
+										<li><a href="#" data-toggle="modal" th:onclick="'openBannerDeleteModal(\''+${banner.id}+'\')'"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- /row toggler -->
+		<!-- Edit Modal -->
+		<div id="editBannerMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Edit Banner</h5>
+					</div>
+					<div class="modal-body">
+						<form id="editBannerFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Display Where: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="objectTypeEditSltId" class="select" required="required" data-placeholder="Select position">
+											<option disabled="disabled" selected="selected" value="">Select position</option>
+											<option th:each="type: ${objectRefs}" th:selected="${type.value==objectRefDefault.value} ? selected" th:value="${type.value}" th:text="${type.name}"></option>
+										</select>
+									</div>
+								</div>
+								
+								<div class="form-group" id="objectIdEventEditDivId" style="display: none">
+									<label class="col-lg-3 control-label">In Event: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="objectIdEventEditSltId" class="select" data-placeholder="Select event">
+											<option disabled="disabled" selected="selected" value="">Select event</option>
+											<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+										</select>
+									</div>
+								</div>
+								
+								<div class="form-group" id="objectIdBoothEditDivId" style="display: none">
+									<label class="col-lg-3 control-label">In Booth: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="objectIdBoothEditSltId" class="select" data-placeholder="Select booth">
+											<option disabled="disabled" selected="selected" value="">Select booth</option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Message: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="msgEditIptId" class="form-control" required="required" placeholder="Message" />
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Content: </label>
+									<div class="col-lg-9">
+										<input type="text" id="infoEditIptId" class="form-control" placeholder="Info" />
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Display Order: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="disOrderEditIptId"  class="touchspin-display-order" required="required" value="1"/>
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Active: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="activeEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="idEditIptId" />
+								<button type="submit" id="editBannerBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitBannerEdit()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Edit Modal -->
+		
+		<!-- Delete Modal -->
+		<div id="deleteBannerMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Delete Banner</h5>
+					</div>
+					<div class="modal-body">
+						<form id="deleteBannerFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idDeleteIptId" />
+								<button type="submit" id="deleteBannerBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitBannerDelete()">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Delete Modal -->
+		<!-- Change image Modal -->
+		<div th:replace="fragments/fragments :: change_photo_modal"></div>
+		<!-- /Change image Modal -->
+	</div>
+</body>
+</html>

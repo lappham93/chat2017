@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="service/service_layout">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding service form -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Add Category</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="addServiceCateFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Parent Category: </label>
+						<div class="col-lg-9">
+							<select id="cateAddSltId" class="select" data-placeholder="Select category">
+								<option selected="selected" value="Q8WBdxZMwvK">ROOT</option>
+								<option th:each="cate: ${categories}" th:value="${cate.id}" th:text="${cate.name}"></option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="nameAddIptId" class="form-control" required="required" placeholder="Name" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Display Order: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="disOrderAddIptId"  class="touchspin-display-order" required="required" value="1"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Is Active: </label>
+						<div class="col-lg-9">
+							<div class="checkbox checkbox-switch">
+								<input type="checkbox" id="activeAddIptId" class="switch" data-on-text="On" 
+									data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+							</div>
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button type="submit" id="addCateBtnId" class="btn bg-pink-400"> Add<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Category List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th>No</th>
+						<th data-toggle="true">Name</th>
+						<th data-hide="phone">Parent Category</th>
+						<th data-hide="phone">Display Order</th>
+						<th data-hide="phone">Status</th>
+						<th data-hide="phone">Update</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="category, categoryStatus : ${categories}">
+						<td th:text="${categoryStatus.count}"></td>
+						<td th:text="${category.name}"></td>
+						<td th:text="${category.parent.name}"></td>
+						<td th:text="${category.displayOrder}"></td>
+						<td th:text="${category.active ? 'Active' : 'Inactive'}"
+							th:class="${category.active ? 'text-primary-600' : 'text-danger-600'}"></td>
+						<td th:text="${category.updatedDate}"></td>
+						<td width="10%">
+							<ul class="icons-list large-device text-center">
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Edit" th:onclick="'openServiceCateEditModal(\''+${category.id}+'\')'"><i class="icon-pencil7"></i></a></li>
+								<li><a href="#" data-toggle="modal" data-popup="tooltip" title="Delete" th:onclick="'openServiceCateDeleteModal(\''+${category.id}+'\')'"><i class="icon-trash"></i></a></li>
+							</ul>
+							<ul class="list list-inline small-device">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" th:onclick="'openServiceCateEditModal(\''+${category.id}+'\')'"><i class="icon-pencil7"></i>Edit</a></li>
+										<li><a href="#" data-toggle="modal" th:onclick="'openServiceCateDeleteModal(\''+${category.id}+'\')'"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- /row toggler -->
+		<!-- Edit Modal -->
+		<div id="editServiceCateMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Edit Category</h5>
+					</div>
+					<div class="modal-body">
+						<form id="editServiceCateFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Parent Category: </label>
+									<div class="col-lg-9">
+										<select id="cateEditSltId" class="select" data-placeholder="Select category">
+											<option value="Q8WBdxZMwvK">ROOT</option>
+											<option th:each="cate: ${categories}" th:value="${cate.id}" th:text="${cate.name}"></option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Name: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="nameEditIptId" class="form-control" required="required" placeholder="Name" />
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Display Order: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="disOrderEditIptId"  class="touchspin-display-order" required="required" value="1"/>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Active: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="activeEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="idEditIptId" />
+								<button type="submit" id="editCateBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitServiceCateEdit()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Edit Modal -->
+		
+		<!-- Delete Modal -->
+		<div id="deleteServiceCateMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Delete Category</h5>
+					</div>
+					<div class="modal-body">
+						<form id="deleteServiceCateFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idDeleteIptId" />
+								<button type="submit" id="deleteCateBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitServiceCateDelete()">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Delete Modal -->
+	</div>
+</body>
+</html>

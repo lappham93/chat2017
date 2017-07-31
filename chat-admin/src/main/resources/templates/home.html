@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/home.js'"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		appStat = [[${appStat}]];
+		/*]]>*/
+	</script>
+</head>
+<body>
+<div layout:fragment="content">
+	<!-- Row toggler -->
+	<div class="panel panel-flat">
+		<div class="panel-heading">
+			<h5 class="panel-title">Report Filter</h5>
+			<div class="heading-elements">
+				<ul class="icons-list">
+					<li><a data-action="collapse"></a></li>
+					<li><a data-action="reload"></a></li>
+					<!-- <li><a data-action="close"></a></li> -->
+				</ul>
+			</div>
+		</div>
+		<div class="panel-body">
+			<form id="reportFilterFrmId">
+				<div class="form-group">
+					<div class="row">
+						<div class="col-lg-4">
+							<select class="select" name="timeline" data-minimum-results-for-search="10">
+								<option th:each="timelineType: ${timelineTypes}" th:value="${timelineType.value}" th:text="${timelineType.name}" th:selected="${timelineType.value} == 3"></option>
+							</select>
+						</div>
+						<div class="col-lg-4">
+							<button id="dateRangeBtnId" type="button" class="btn bg-teal pull-right">
+								<i class="icon-calendar22 position-left"></i> <span></span> <b class="caret"></b>
+							</button>
+						</div>
+						<div class="col-lg-4">
+							<button type="submit" class="btn bg-teal pull-right">
+								Apply
+							</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-6">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h5 class="panel-title">Sign Up Report</h5>
+					<div class="heading-elements">
+						<ul class="icons-list">
+							<li><a data-action="collapse"></a></li>
+							<li><a data-action="reload"></a></li>
+							<li><a data-action="close"></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table class="table table-xlg text-nowrap">
+							<tbody>
+							<tr>
+								<td class="col-md-4">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-user-plus"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalUser : 0}"></span> <small class="display-block no-margin">users</small>
+										</h5>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="chart-container">
+						<div class="chart has-fixed-height" id="signUpChart"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-lg-6">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h5 class="panel-title">Event Report</h5>
+					<div class="heading-elements">
+						<ul class="icons-list">
+							<li><a data-action="collapse"></a></li>
+							<li><a data-action="reload"></a></li>
+							<li><a data-action="close"></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table class="table table-xlg text-nowrap">
+							<tbody>
+							<tr>
+								<td class="col-md-4">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-calendar3"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalEvent : 0}"></span> <small class="display-block no-margin">events</small>
+										</h5>
+									</div>
+								</td>
+
+								<td class="col-md-4">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-pyramid2"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalBooth : 0}"></span> <small class="display-block no-margin">booths</small>
+										</h5>
+									</div>
+								</td>
+								
+								<td class="col-md-4">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-dice"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalProduct : 0}"></span> <small class="display-block no-margin">products</small>
+										</h5>
+									</div>
+								</td>
+
+							</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="chart-container">
+						<div class="chart has-fixed-height" id="eventPie"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-6">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<h5 class="panel-title">Social Report</h5>
+					<div class="heading-elements">
+						<ul class="icons-list">
+							<li><a data-action="collapse"></a></li>
+							<li><a data-action="reload"></a></li>
+							<li><a data-action="close"></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="table-responsive">
+						<table class="table table-xlg text-nowrap">
+							<tbody>
+							<tr>
+								<td class="col-md-2">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-feed2"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalFeed : 0}"></span> <small class="display-block no-margin">feeds</small>
+										</h5>
+									</div>
+								</td>
+								
+								<td class="col-md-2">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-comment"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalComment : 0}"></span> <small class="display-block no-margin">comments</small>
+										</h5>
+									</div>
+								</td>
+								
+								<td class="col-md-2">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-heart5"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalLike : 0}"></span> <small class="display-block no-margin">likes</small>
+										</h5>
+									</div>
+								</td>
+								
+								<td class="col-md-2">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-man-woman"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalFollow : 0}"></span> <small class="display-block no-margin">follows</small>
+										</h5>
+									</div>
+								</td>
+								
+								<td class="col-md-2">
+									<div class="media-left media-middle">
+										<a href="#" class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon"><i class="icon-share3"></i></a>
+									</div>
+
+									<div class="media-left">
+										<h5 class="text-semibold no-margin">
+											<span th:text="${appStat != null ? appStat.totalShare : 0}"></span> <small class="display-block no-margin">shares</small>
+										</h5>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="chart-container">
+						<div class="chart has-fixed-height" id="socialChart"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ 
+ </div>
+</body>
+</html>

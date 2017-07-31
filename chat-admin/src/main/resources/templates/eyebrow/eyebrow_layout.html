@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/eyebrow.js'"></script>
+</head>
+<body>
+	<div layout:fragment="second_navbar" style="margin-top:-30px">
+		<!-- Secondary navbar -->
+		<div class="navbar navbar-default navbar-xs">
+			<ul class="nav navbar-nav no-border visible-xs-block">
+				<li><a class="text-center collapsed" data-toggle="collapse" data-target="#navbar-second-toggle"><i class="icon-circle-down2"></i></a></li>
+			</ul>
+	
+			<div class="navbar-collapse collapse" id="navbar-second-toggle">
+				<ul class="nav navbar-nav">
+					<li th:class="${isCateNav} ? active">
+						<a th:href="@{${admin_prefix} + '/eyebrow/category/list'}"><i class="icon-grid6 position-left"></i> Category</a>
+					</li>
+	
+					<li th:class="${isEyebrowNav} ? active">
+						<a th:href="@{${admin_prefix} + '/eyebrow'}"><i class="icon-eye4 position-left"></i> Eyebrow</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="tab-content">
+			<div class="tab-pane fade active in has-padding">
+				<div layout:fragment="tab_content">
+				</div>
+			</div>
+		</div>
+		<!-- /secondary navbar -->
+	</div>
+</body>
+</html>

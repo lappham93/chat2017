@@ -1,0 +1,48 @@
+package com.mit.define;
+
+public enum ApiError {
+	SUCCESS(0), SERVER_ERROR(-1, "Unknown error."), UNSUPPORT(-2),
+
+	API_INVALID(-100), PARAMS_INVALID(-101),DATA_INVALID(-102), SESSION_TIMEOUT(-103), REQUEST_TIMEOUT(-104), UNACCESSABLE(-105),
+	REFRESHTOKEN_TIMEOUT(-106), BAN(-107), INVALID_TOKEN(-108),
+
+	MISSING_PARAM(-200, "Miss param."), FEED_NOT_EXIST(-201), FEED_CONTENT_EMPTY(-202), PERMISSION_LIMIT(-203), PARSE_LINK_ERROR(-204), REPORT_ERROR(-205),
+	ITEM_NOT_FOUND(-206),
+
+	NO_HOME(-300), NO_PAYMENT_METHOD(-301), BILLING_ADDRESS_NOT_EXIST(-302), INVALID_CARD_NUMBER(-303), INVALID_CARD_CODE(-304), INVALID_EXPIRATION_DATE(-305),
+	INVALID_PROMOTION_CODE(-306), ADDRESS_ALREADY_EXIST(-307), HOME_EXIST(-308), CARD_EXIST(-309), PAYMENT_METHOD_NOT_AVAILABLE(-310), PAYMENT_ERRROR(-311),
+	NONCE_INVALID(-312), NO_GARDEN(-313), INVALID_PAYMENT_METHOD(-314), UNABLE_CHANGE_NAME(-315), LAST_HISTORY_IN_PROCESS(-316), PAYMENT_ERROR(-317),
+	REGION_NOT_AVAILABLE(-318), INVALID_DATE(-319),
+
+	CHAT_BAN(-400),
+
+	APPLICATION_PENDING(-450), BANK_ACCOUNT_INVALID(-451), APPLICATION_STATUS_INVALID(-452),
+	
+	IMAGE_PROCESSING_ERROR(-500),
+
+	UPLOAD_LIMIT(-1001, "Exceed upload limit."), UPLOAD_DATA_INVALID(-1002), UPLOAD_PART_NOT_EXIST(-1003);
+	
+	private int value;
+	private String message;
+	
+	private ApiError(int value) {
+		this.value = value;
+	}
+
+	private ApiError(int value, String message) {
+		this.value = value;
+		this.message = message;
+	}
+	
+	public int getValue() {
+		return value;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+}

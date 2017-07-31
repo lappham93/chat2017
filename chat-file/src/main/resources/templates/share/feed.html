@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="share/layout">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h4 class="share-title">Saocoo Feed</h4>
+		<div th:if="${feed != null}">
+			<div class="col-lg-12">
+				<span><img alt="avatar" th:src="${profile.avatar}" style="width: 40px"/></span> <span th:text="${profile.displayName}"></span>
+			</div>
+			<div class="col-lg-12 share-ele feed-message">
+				<span th:text="${feed.message}"></span>
+			</div>
+			<div class="col-lg-12 share-ele" th:if="${feed.type == 1}">
+				<div th:each="photo: ${feed.photos}">
+					<img class="col-lg-4" alt="photo" th:src="@{${photo.link}}"/>
+				</div>
+			</div>
+			<div class="col-lg-12 share-ele" th:if="${feed.type == 2}">
+				<div>
+					<span th:text="${feed.link.title}"></span>
+				</div>
+				<img class="col-lg-4" alt="photo" th:src="@{${feed.link.thumbnail}}"/>
+				<div>
+					<span th:text="${feed.link.description}"></span>
+				</div>
+			</div>
+			<div class="col-lg-12 share-ele" th:if="${feed.type == 4}">
+				<img class="col-lg-4 sticker" alt="sticker" th:src="@{${stickerPath + '/' + feed.sticker}}"/>
+			</div>
+			<div class="col-lg-12 share-ele">
+				<i class="icon icon-heart5"></i><span th:text="${' ' + feed.totalLike}"></span>
+				<i class="icon icon-comment" style="margin-left: 20px;"></i><span th:text="${' ' + feed.totalComment}"></span>
+				<i class="icon icon-eye2" style="margin-left: 20px;"></i><span th:text="${' ' + feed.totalView}"></span>
+			</div>
+		</div>
+	</div>
+
+</body>    
+</html>

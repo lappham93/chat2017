@@ -1,3 +1,11 @@
+.recommenders/
+.metadata/
+chat-models/target/
+chat-admin/target/
+chat-socket/target/
+chat-worker/target/
+common/target
+chat-file/target/
 # Compiled class file
 *.class
 

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="share/layout">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<ul class="content-top">
+			<li><div class="share-title lined">Invite Friends</div></li>
+			<li><div class="share-description">Use your friend's invite code below</div></li>
+			<li><div class="invite-code" th:text="${inviteCode}"></div></li>
+		</ul>
+		<ul class="content-middle">
+			<li><img th:src="@{${resources_path} + '/images/homber-07.png'}"/></li>
+			<li><div class="invite-message" th:utext="${inviteMessage}"></div></li>
+		</ul>
+	</div>
+
+</body>    
+</html>	

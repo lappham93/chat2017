@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+</head>
+<body>
+	<div th:fragment="form_error">
+		<div th:if="${error_if}" class="alert alert-danger alert-styled-right alert-bordered" th:text="${error_msg}">    
+        </div>
+	</div>
+	
+	<div th:fragment="form_error_2">
+		<div class="alert alert-danger alert-styled-right alert-bordered form-error" style="display:none">    
+        </div>
+	</div>
+	
+	<div th:fragment="form_success">
+		<div th:if="${success_if}" class="alert alert-success alert-styled-right alert-arrow-right alert-bordered" th:text="${success_msg}">    
+        </div>
+	</div>
+	
+	<div th:fragment="form_success_2">
+		<div class="alert alert-success alert-styled-right alert-arrow-right alert-bordered form-success" style="display:none">    
+        </div>
+	</div>
+	
+	<div th:fragment="form_warning">
+		<div th:if="${warning_if}" class="alert alert-warning alert-styled-right form-warning" th:text="${warning_msg}">    
+        </div>
+	</div>
+	
+	<div th:fragment="form_warning_2">
+		<div class="alert alert-warning alert-styled-right form-warning" style="display:none">    
+        </div>
+	</div>
+	
+	<div th:fragment="dynamic-paging">
+		<div class="text-center bootpag-flat"></div>
+	</div>
+	
+	<div th:fragment="simple-paging">
+		<div th:if="${isPaging}" class="panel panel-body border-top-teal text-center">
+			<ul class="pager pager-linked text-right">
+				<li th:class="${pagingPrev == null || pagingPrev == ''} ? disabled"><a th:href="@{${admin_prefix + pagingPrev}}">&larr; Previous</a></li>
+				<li th:class="${pagingNext == null || pagingNext == ''} ? disabled"><a th:href="@{${admin_prefix + pagingNext}}">Next &rarr;</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<div th:fragment="form">
+		<form action="">
+			
+		</form>
+	</div>
+	
+	<div th:fragment="form_submit_button">
+		<div class="form-group">
+			<button class="btn bg-pink-400 btn-block" onclick=""> <i class="icon-circle-right2 position-right"></i></button>
+		</div>
+	</div>
+	
+	<div th:fragment="loader">
+		<div class="loader">
+			<i class="icon-spinner spinner"></i><span class="loader-text"></span>
+		</div>
+	</div>
+	
+	<div th:fragment="change_photo_modal">
+		<div id="editPhotoMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Change Thumb</h5>
+					</div>
+					<div class="modal-body">
+						<form action="#" id="editPhotoFrmId" class="dropzone dropzone_single">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: loader"></div>
+							<input type="file" id="photoEditIptId" class="filesCls" style="display:none"/>
+							<input type="hidden" id="idEditPhotoIptId" />
+							<button type="submit" id="editPhotoBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+						</form>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitPhotoEdit()">Change</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

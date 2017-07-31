@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+    layout:decorator="header_layout">
+<head>
+	<!-- HTTPS required. HTTP will give a 403 forbidden response -->
+	<script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
+	<!--  page ref -->
+	<link th:href="${resources_path} + '/css/app/login.css'" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/login.js'"></script>
+	
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		/* AccountKit_OnInteractive = function initAccountKit(){
+		    AccountKit.init(
+		      {
+		        appId:[[${facebook_appId}]], 
+		        state:[[${csrf}]],
+		        version:[[${accountKit_api_version}]],
+		        fbAppEventsEnabled:true,
+		        debug:false,
+		      }
+		    );
+		}; */
+		/*]]>*/
+	</script>
+</head>
+
+<body class="login-container">
+	<div layout:fragment="body">
+		<!-- Main navbar -->
+		<div class="navbar navbar-inverse bg-indigo">
+			<div class="navbar-header">
+				<a class="navbar-brand" th:href="${admin_prefix}"><img th:src="${resources_path} + '/images/app-logo.png'" alt=""/></a>
+	
+				<ul class="nav navbar-nav pull-right visible-xs-block">
+					<li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+				</ul>
+			</div>
+	
+			<div class="navbar-collapse collapse" id="navbar-mobile">
+				<ul class="nav navbar-nav navbar-right">
+				</ul>
+			</div>
+		</div>
+		<!-- /main navbar -->
+	
+	
+		<!-- Page container -->
+		<div class="page-container">
+	
+			<!-- Page content -->
+			<div class="page-content">
+	
+				<!-- Main content -->
+				<div class="content-wrapper">
+	
+					<!-- Content area -->
+					<div class="content">
+						<!-- Simple login form -->
+						<form id="loginFrmId">
+							<div class="panel panel-body login-form">
+								<div class="text-center">
+									<div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
+									<h5 class="content-group">Login to your account <small class="display-block">Enter your credentials below</small></h5>
+								</div>
+								<div th:replace="fragments/fragments :: form_error_2"></div>
+								<div th:replace="fragments/fragments :: form_success_2"></div>
+								<div th:replace="fragments/fragments :: loader"></div>
+								
+								<div class="system-admin-login">
+									<div class="form-group has-feedback has-feedback-left">
+										<input type="text" class="form-control" id="nameIptId" required="required" placeholder="Username"/>
+										<div class="form-control-feedback">
+											<i class="icon-user text-muted"></i>
+										</div>
+									</div>
+					
+									<div class="form-group has-feedback has-feedback-left">
+										<input type="password" class="form-control" id="passwordIptId" required="required" placeholder="Password"/>
+										<div class="form-control-feedback">
+											<i class="icon-lock2 text-muted"></i>
+										</div>
+									</div>
+									<div class="form-group">
+										<button type="submit" class="btn bg-pink-400 btn-block">Sign in <i class="icon-circle-right2 position-right"></i></button>
+									</div>
+								</div>
+								<!-- <div class="shop-admin-login">
+									<div class="form-group">
+										<button class="btn bg-pink-400 btn-block" onclick="return accountKitSMSLogin();">Login via SMS <i class="icon-circle-right2 position-right"></i></button>
+									</div> 
+									<div class="form-group">
+										<button class="btn bg-pink-400 btn-block" onclick="return accountKitEmailLogin();">Login via Email <i class="icon-circle-right2 position-right"></i></button>
+									</div>
+								</div> -->
+							</div>
+						</form>
+						<!-- Register form -->
+	
+						<!-- Footer -->
+						<div class="footer text-muted text-center">
+							&copy; 2017. Homber
+						</div>
+						<!-- /footer -->
+	
+					</div>
+					<!-- /content area -->
+	
+				</div>
+				<!-- /main content -->
+	
+			</div>
+			<!-- /page content -->
+	
+		</div>
+		<!-- /page container -->
+	</div>
+</body>
+</html>

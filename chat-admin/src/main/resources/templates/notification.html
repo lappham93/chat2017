@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/notification.js'"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Notify web -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Web Notification</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="webNotificationFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Message: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="msgAddIptId" class="form-control" required="required" placeholder="Message" />
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Url: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="url" id="urlAddIptId" class="form-control" required="required" placeholder="Url" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Thumb: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="file" id="photoIptId" class="file-styled" required="required" accept="image/*"/>
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="webNotifyBtnId"> Notify<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<!-- Notify event -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Event Notification</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="eventNotificationFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="eventNESltId" class="select" required="required" data-placeholder="Select event">
+								<option disabled="disabled" selected="selected" value="">Select event</option>
+								<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Message: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="msgNEIptId" class="form-control" required="required" placeholder="Message" />
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="eventNotifyBtnId"> Notify<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!-- Notify booth -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Booth Notification</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="boothNotificationFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="eventNBSltId" class="select" required="required" data-placeholder="Select event">
+								<option disabled="disabled" selected="selected" value="">Select event</option>
+								<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Booth: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="boothNBSltId" class="select" required="required" data-placeholder="Select booth">
+								<option disabled="disabled" selected="selected" value="">Select booth</option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Message: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="msgNBIptId" class="form-control" required="required" placeholder="Message" />
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="boothNotifyBtnId"> Notify<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<!-- Notify product -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Product Notification</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="productNotificationFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="eventNPSltId" class="select" required="required" data-placeholder="Select event">
+								<option disabled="disabled" selected="selected" value="">Select event</option>
+								<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Booth: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="boothNPSltId" class="select" required="required" data-placeholder="Select booth">
+								<option disabled="disabled" selected="selected" value="">Select booth</option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Product: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="productNPSltId" class="select" required="required" data-placeholder="Select product">
+								<option disabled="disabled" selected="selected" value="">Select product</option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Message: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="msgNPIptId" class="form-control" required="required" placeholder="Message" />
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="productNotifyBtnId"> Notify<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<!-- Notify booth advertisement -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Booth Advertisement Notification</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="advNotificationFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div th:replace="fragments/fragments :: loader"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="eventNASltId" class="select" required="required" data-placeholder="Select event">
+								<option disabled="disabled" selected="selected" value="">Select event</option>
+								<option th:each="event: ${events}" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Booth: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="boothNASltId" class="select" required="required" data-placeholder="Select booth">
+								<option disabled="disabled" selected="selected" value="">Select booth</option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Message: </label>
+						<div class="col-lg-9">
+							<input type="text" id="msgNAIptId" class="form-control" placeholder="Message" />
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="advNotifyBtnId"> Notify<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

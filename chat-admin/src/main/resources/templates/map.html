@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/midlib/d3/d3-collection.v1.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/js/midlib/d3/d3plus.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/js/midlib/d3/d3.v3.min.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/js/midlib/d3/d3.tip.v0.6.3.js'"></script>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/map.js'"></script>
+	
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding banner form -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">View map</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="viewMapFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<!-- <div th:replace="fragments/fragments :: loader"></div> -->
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Event: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="eventViewSltId" class="select" required="required" data-placeholder="Select Event">
+								<option disabled="disabled" selected="selected" value="">Select Event</option>
+								<option th:each="event: ${events}" th:selected="${event.id == eventSelected} ? selected" th:value="${event.id}" th:text="${event.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Floor: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="floorViewSltId" class="select" required="required" data-placeholder="Select type">
+								<option disabled="disabled" selected="selected" value="">Select Floor</option>
+								<option th:each="floor: ${floors}" th:selected="${floor.id == floorSelected} ? selected" th:value="${floor.id}" th:text="${floor.name}"></option>
+							</select>
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button class="btn bg-pink-400" id="addBannerBtnId"> View Map<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!-- Adding banner form -->
+		<div class="panel panel-flat" th:if="${showMap}">
+			<script th:inline="javascript">
+				/*<![CDATA[*/
+					MAP.WI = [[${map.photo.width}]];
+					MAP.HI = [[${map.photo.height}]];
+					MAP.LINK = [[${map.photo.link}]];
+					MAP.WV = [[${map.widthView}]];
+					MAP.HV = [[${map.heightView}]];
+					MAP.dataEdge = [[${map.pathMap}]];
+					mapObject.navigation.dataPoint = [[${map.pointMap}]];
+					mapObject.booth.dataPoint = [[${map.boothMap}]];
+					mapObject.elevator.dataPoint = [[${map.elevatorMap}]];
+					mapObject.escalator.dataPoint = [[${map.escalatorMap}]];
+					mapObject.beacon.dataPoint = [[${map.beaconMap}]];
+					mapObject.wc.dataPoint = [[${map.WCMap}]];
+					mapObject.talk.dataPoint = [[${map.talkMap}]];
+					mapObject.user.dataPoint = [[${map.userMap}]];
+				/*]]>*/
+			</script>
+			<div class="panel-heading">
+				<h5 class="panel-title">Map</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-xs-10 map" style="background-color: lightgray; padding-left: 0px; padding-right: 0px;">
+				<svg id="mapSvgId" style="width:80%; height: auto; margin-left:10%; margin-right: 10%"></svg>
+			</div>
+			<div class="col-xs-2" style="margin-top: 10px">
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #009688;"></span>
+	                <span class="text">Old Point</span>
+	            </span>
+	            <br/>
+	            <span class="sumary">
+	                <span class="badge-custom" style="background-color: #ae2;"></span>
+	                <span class="text">New Point</span>
+	            </span>
+	            <br/>
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #9C27B0;"></span>
+	                <span class="text">Booth</span>
+	            </span>
+	            <br/>
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #3F51B5;"></span>
+	                <span class="text">Elevator</span>
+	            </span>
+	            <br/>
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #00BCD4;"></span>
+	                <span class="text">Escalator</span>
+	            </span>
+	            <br/>
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #F43636;"></span>
+	                <span class="text">User</span>
+	            </span>
+	            <br/>
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #FFEB3B;"></span>
+	                <span class="text">WC</span>
+	            </span>
+	            <br/>
+	            <span class="summary">
+	                <span class="badge-custom" style="background-color: #607D8B;"></span>
+	                <span class="text">Talk</span>
+	            </span>
+	            
+	        </div>
+			<div class="col-xs-10" style="text-align: center;">
+	            <button id="zoomIn">Zoom In [+]</button>
+	            <button id="zoomOut">Zoom Out [-]</button>
+	            <button id="moveLeft">Move Left</button>
+	            <button id="moveRight">Move Right</button>
+	            <button id="moveTop">Move Top</button>
+	            <button id="moveBottom">Move Bottom</button>
+	            <button id="showHideLabel">Hide Label</button>
+	            <button id="saveMap">Save</button>
+		 	</div>
+			<div id="dialog-message" class="hide">
+			    <form id="addMapFrmId" class="form-horizontal">
+			        <div id="al_alert_err" class="alert alert-danger" style="display: none;"></div>
+			        <div class="form-group">
+						<label class="col-lg-3 control-label">Type: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="typeSltId" class="select" required="required" data-placeholder="Select type">
+								<option disabled="disabled" selected="selected" value="">Select type</option>
+								<option th:each="type: ${objectTypes}" th:value="${type.value}" th:text="${type.name}"></option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group" id="boothDivId" style="display: none;">
+						<label class="col-lg-3 control-label">Booth: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="boothSltId" class="select" data-placeholder="Select booth">
+								<option disabled="disabled" selected="selected" value="">Select booth</option>
+								<option th:each="booth: ${map.boothMap}" th:if="${!booth.value.located}" th:value="${booth.key}" th:text="${booth.value.name}"></option>
+							</select>
+						</div>
+					</div>
+			        <div class="form-group" id="elevatorDivId" style="display: none;">
+						<label class="col-lg-3 control-label">Elevator: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="elevatorSltId" class="select" data-placeholder="Select elevator">
+								<option disabled="disabled" selected="selected" value="">Select elevator</option>
+								<option th:each="booth: ${elevators}" th:value="${booth.id}" th:text="${booth.name}"></option>
+							</select>
+						</div>
+					</div>
+			        <div class="form-group" id="escalatorDivId" style="display: none;">
+						<label class="col-lg-3 control-label">Escalator: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="escalatorSltId" class="select" data-placeholder="Select escalator">
+								<option disabled="disabled" selected="selected" value="">Select escalator</option>
+								<option th:each="booth: ${escalators}" th:value="${booth.id}" th:text="${booth.name}"></option>
+							</select>
+						</div>
+					</div>
+			        <div class="form-group" id="beaconDivId" style="display: none;">
+						<label class="col-lg-3 control-label">Beacon: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="beaconSltId" class="select" data-placeholder="Select beacon">
+								<option disabled="disabled" selected="selected" value="">Select beacon</option>
+								<option th:each="booth: ${map.beaconMap}" th:if="${!booth.value.located}" th:value="${booth.key}" th:text="${booth.value.name}"></option>
+							</select>
+						</div>
+					</div>
+			       <div class="form-group" id="wcDivId" style="display: none;">
+						<label class="col-lg-3 control-label">WC: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="wcSltId" class="select" data-placeholder="Select WC">
+								<option disabled="disabled" selected="selected" value="">Select WC</option>
+								<option th:each="booth: ${map.WCMap}" th:if="${!booth.value.located}" th:value="${booth.key}" th:text="${booth.value.name}"></option>
+							</select>
+						</div>
+					</div>
+			        <div class="form-group" id="talkDivId" style="display: none;">
+						<label class="col-lg-3 control-label">Talk: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="talkSltId" class="select" data-placeholder="Select talk">
+								<option disabled="disabled" selected="selected" value="">Select talk</option>
+								<option th:each="booth: ${map.talkMap}" th:if="${!booth.value.located}" th:value="${booth.key}" th:text="${booth.value.name}"></option>
+							</select>
+						</div>
+					</div>
+			        <input type="hidden" id="bidev" name="bidev" value="{{EID}}"/>
+			        <input type="hidden" id="bidfl" name="bidfl" value="{{FID}}"/>
+			        <input type="hidden" id="idlc" name="idlc" value=""/>
+			        <input type="hidden" id="lx" name="lx" value=""/>
+			        <input type="hidden" id="ly" name="ly" value=""/>
+			        <input type="hidden" id="ix" name="ix" value=""/>
+			        <input type="hidden" id="iy" name="iy" value=""/>
+			    </form>
+			</div>
+			
+			<div id="saveMapMdlId" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h5 class="modal-title">Save Map</h5>
+						</div>
+						<div class="modal-body">
+							<form id="saveMapFrmId" class="form-horizontal">
+								<div th:replace="fragments/fragments :: form_error_2"></div>
+								<div th:replace="fragments/fragments :: form_success_2"></div>
+								<div th:replace="fragments/fragments :: form_warning_2"></div>
+								<div th:replace="fragments/fragments :: loader"></div>
+								<div class="panel-body">
+									<input type="hidden" id="idSaveIptId" th:value="${floorSelected}"/>
+									<button type="submit" id="saveMapBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+								</div>
+							</form>
+						</div>
+						
+						<div class="modal-footer">
+							<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" onclick="submitSaveMap()">Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="row">
+		    <div class="col-xs-12" style="">
+		        <!--<img src="{{static-domain}}/map/mapdemo.svg" alt="map" width="1024" height="768"/>-->
+		    </div>
+		</div>
+	</div>
+</body>
+</html>
