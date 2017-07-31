@@ -12,7 +12,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(value = "Chat controller")
 @RestController
-@RequestMapping(value = "/chat")
+@RequestMapping(value = {"/chat", "/home"})
 public class ChatController {
 
 	@ApiOperation(value = "render chat")

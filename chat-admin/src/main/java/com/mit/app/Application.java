@@ -46,7 +46,7 @@ import com.mit.user.entities.RegionManagerProfile;
 		"com.mit.session", "com.mit.data", "com.mit.service", "com.mit.asset", "com.mit.utils",
 		"com.mit.banner", "com.mit.conts",  "com.mit.react", "com.mit.social", "com.mit.facebook", "com.mit.stat",
 		"com.mit.notification", "com.mit.event", "com.mit.navigation", "com.mit.google", "com.mit.admin.services", "com.mit.suggest",
-		"com.mit.betaface", "com.mit.face"})
+		"com.mit.betaface", "com.mit.face", "com.mit.socket", "com.mit.message"})
 public class Application {
 	public static Environment EnvConfig;
 	public static ApplicationContext AppCtx;
@@ -123,7 +123,7 @@ public class Application {
 		AdminAuthenticationFilter<UserSession> filter = new AdminAuthenticationFilter<>(sessionManager);
 		FilterRegistrationBean registration = new FilterRegistrationBean(filter);
 		registration.addUrlPatterns("/*");
-		registration.addInitParameter("excludePatterns", StringUtils.join(new String[]{adminPrefix + "/login", adminPrefix + "/face", resourcesPath, "/favicon.ico", adminPrefix + "/chat"}, ","));
+		registration.addInitParameter("excludePatterns", StringUtils.join(new String[]{adminPrefix + "/login", adminPrefix + "/face", resourcesPath, "/favicon.ico"}, ","));
 		registration.addInitParameter("profileClasses", StringUtils.join(new String[]{AdminProfile.class.getSimpleName(), RegionManagerProfile.class.getSimpleName()}, ","));
 		registration.addInitParameter("redirectPath", adminPrefix + "/login");
 		registration.setDispatcherTypes(DispatcherType.REQUEST);

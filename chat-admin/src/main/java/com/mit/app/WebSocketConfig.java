@@ -22,6 +22,7 @@ import com.mit.http.session.SessionManager;
 import com.mit.session.SessionManagerImpl;
 import com.mit.session.entities.UserSession;
 import com.mit.socket.interceptors.HttpHandshakeInterceptor;
+import com.mit.user.entities.AdminProfile;
 import com.mit.user.entities.Profile;
 
 @Configuration
@@ -53,13 +54,13 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/api")
-			.setHandshakeHandler(new SecureHandshakeHandler(sessionGenerator(), Profile.class.getSimpleName()))
+			.setHandshakeHandler(new SecureHandshakeHandler(sessionGenerator(), AdminProfile.class.getSimpleName()))
 			.withSockJS()
 				.setWebSocketEnabled(true)
 	            .setStreamBytesLimit(512 * 1024)
 	            .setHttpMessageCacheSize(1000)
 	            .setDisconnectDelay(30 * 1000)
-	            .setInterceptors(new HttpHandshakeInterceptor<>(sessionGenerator(), Profile.class.getSimpleName()));
+	            .setInterceptors(new HttpHandshakeInterceptor<>(sessionGenerator(), AdminProfile.class.getSimpleName()));
 	}
 	
 	

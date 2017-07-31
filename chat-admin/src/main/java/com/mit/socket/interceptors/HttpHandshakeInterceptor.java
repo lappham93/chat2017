@@ -1,7 +1,10 @@
 package com.mit.socket.interceptors;
 
 import com.mit.http.session.SessionManager;
+import com.mit.sessions.AdminSession;
 import com.mit.utils.JsonUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -38,8 +41,8 @@ public class HttpHandshakeInterceptor<T> implements HandshakeInterceptor {
             HttpHeaders headers = request.getHeaders();
             logger.info("Handshake headers: " + JsonUtils.Instance.toJson(headers));
 
-            if (headers.containsKey("Session")) {
-                String sessionKey = headers.getFirst("Session");
+            String sessionKey = AdminSession.getSessionKey(((ServletServerHttpRequest) request).getServletRequest());
+            if (!StringUtils.isEmpty(sessionKey)) {
                 logger.info("Handshake sessionKey: " + sessionKey);
 
                 if (sessionKey != null && !sessionKey.isEmpty()) {

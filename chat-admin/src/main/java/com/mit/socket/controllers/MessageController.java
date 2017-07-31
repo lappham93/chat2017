@@ -2,15 +2,16 @@ package com.mit.socket.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.mit.http.ApiResponse;
 import com.mit.message.bodies.GetMessageBody;
-import com.mit.message.bodies.MessageBody;
-import com.mit.message.entities.Message2;
 import com.mit.message.repositories.Message2Repo;
+import com.mit.socket.bodies.HelloMessage;
+import com.mit.socket.responses.Greeting;
 import com.mit.utils.AdminConstant;
 
 @Controller
@@ -20,17 +21,13 @@ public class MessageController {
 	@Autowired
 	private SimpMessagingTemplate messageTemplate;
 
-	@MessageMapping(value = "/message-send")
-	public ApiResponse<Object> sendMessage(SimpMessageHeaderAccessor headerAccessor, MessageBody body) {
-		try {
-			Message2 message = body.toMessage();
-			messageRepo.save(message);
-			messageTemplate.convertAndSend("/topic/message", message);
-			return new ApiResponse<>();
-		} catch (Exception e) {
-			return new ApiResponse<>(AdminConstant.errCode, AdminConstant.serverErrMsg);
-		}
-	}
+	@MessageMapping("/hello")
+//    @SendTo("/topic/greetings")
+    public Greeting greeting(SimpMessageHeaderAccessor headerAccessor, HelloMessage message) throws Exception {
+        Thread.sleep(1000); // simulated delay
+        messageTemplate.convertAndSend("/topic/greetings", new Greeting("Hello, " + message.getName() + "!"));
+        return new Greeting("Hello, " + message.getName() + "!");
+    }
 	
 	@MessageMapping(value = "/message-get")
 	public ApiResponse<Object> getMessage(SimpMessageHeaderAccessor headerAccessor, GetMessageBody body) {
